@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f1e6">
+<title>天皇陛下 暗記帖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Old+Mincho:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --washi:#f6f1e6;
+  --card:#fffdf8;
+  --sumi:#2a2724;
+  --sumi-soft:#6b6357;
+  --shu:#b03a2e;
+  --shu-soft:#c9634f;
+  --kin:#b08d3f;
+  --line:#ddd3bd;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  font-family:"Shippori Mincho","Yu Mincho","Hiragino Mincho ProN",serif;
+  color:var(--sumi);
+  background-color:var(--washi);
+  background-image:
+    radial-gradient(circle at 12% 4%, rgba(255,255,255,.85), transparent 55%),
+    radial-gradient(circle at 88% 96%, rgba(206,188,155,.35), transparent 60%);
+  min-height:100vh;
+  padding-bottom:48px;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+}
+.app{position:relative;z-index:1;max-width:460px;margin:0 auto;padding:0 18px}
+
+/* ── 題字 ── */
+.site-head{text-align:center;padding:30px 0 0}
+.site-head h1{
+  font-family:"Zen Old Mincho","Shippori Mincho",serif;
+  font-size:1.55rem;letter-spacing:.24em;margin:0 0 8px;font-weight:700;text-indent:.24em;
+}
+.site-head .sub{font-size:.7rem;letter-spacing:.14em;color:var(--sumi-soft);margin:0}
+.rule{height:1px;margin:16px 0 0;background:linear-gradient(90deg,transparent,var(--line) 12%,var(--line) 88%,transparent)}
+
+/* ── タブ ── */
+.tabs{display:flex;margin:18px 0 18px;border-bottom:1px solid var(--line)}
+.tab{
+  flex:1;appearance:none;background:none;border:0;cursor:pointer;position:relative;
+  font-family:inherit;font-size:.95rem;letter-spacing:.16em;color:var(--sumi-soft);
+  padding:11px 0 12px;transition:color .2s;
+}
+.tab.active{color:var(--sumi);font-weight:700}
+.tab.active::after{content:"";position:absolute;left:18%;right:18%;bottom:-1px;height:2px;background:var(--shu);border-radius:2px}
+
+.panel{display:none}
+.panel.active{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── 操作部品 ── */
+.controls{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.select-wrap{position:relative;flex:1}
+.select-wrap::after{content:"▾";position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--kin);font-size:.7rem;pointer-events:none}
+select,input[type=search]{
+  width:100%;font-family:inherit;font-size:.84rem;letter-spacing:.08em;color:var(--sumi);
+  padding:11px 32px 11px 12px;border:1px solid var(--line);border-radius:3px;
+  background:var(--card);appearance:none;outline:none;
+}
+input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none}
+select:focus,input:focus{border-color:var(--kin)}
+.check{display:flex;align-items:center;gap:6px;font-size:.76rem;letter-spacing:.06em;color:var(--sumi-soft);white-space:nowrap;cursor:pointer}
+.check input{accent-color:var(--shu);width:15px;height:15px}
+
+/* ── 進捗 ── */
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bar{flex:1;height:3px;background:rgba(0,0,0,.07);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--kin),var(--shu));transition:width .4s ease}
+.progress-row span{font-size:.7rem;letter-spacing:.1em;color:var(--sumi-soft);min-width:3.6em;text-align:right}
+
+/* ── カード ── */
+#cardWrap{perspective:1400px;margin-bottom:16px}
+.card{
+  position:relative;width:100%;height:300px;cursor:pointer;
+  transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.8,.4,1);
+}
+.card.flipped{transform:rotateY(180deg)}
+.face{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;overflow:hidden;
+  background:var(--card);border:1px solid var(--line);border-radius:4px;
+  box-shadow:0 6px 20px rgba(80,66,40,.10),inset 0 0 0 6px rgba(255,255,255,.6);
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+}
+.face::before,.face::after{content:"";position:absolute;width:26px;height:26px;opacity:.5}
+.face::before{top:10px;left:10px;border-top:1px solid var(--kin);border-left:1px solid var(--kin)}
+.face::after{bottom:10px;right:10px;border-bottom:1px solid var(--kin);border-right:1px solid var(--kin)}
+.face.back{transform:rotateY(180deg)}
+
+.era-badge{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  font-size:.66rem;letter-spacing:.2em;color:var(--kin);
+  border:1px solid rgba(176,141,63,.45);border-radius:2px;
+  padding:2px 10px 2px 12px;background:rgba(255,255,255,.5);white-space:nowrap;
+}
+.dai{font-size:1.5rem;letter-spacing:.1em;color:var(--sumi-soft)}
+.dai b{font-size:2.1em;color:var(--sumi);letter-spacing:.02em;margin:0 .06em}
+.tap-hint{position:absolute;bottom:18px;font-size:.68rem;letter-spacing:.18em;color:#b9ae98}
+
+.name{font-size:1.75rem;letter-spacing:.06em;line-height:1.35;text-align:center}
+.kana{font-size:.8rem;letter-spacing:.24em;color:var(--sumi-soft);margin-top:10px;text-indent:.24em}
+.note{
+  margin-top:20px;padding-top:14px;border-top:1px dashed var(--line);
+  font-size:.8rem;line-height:1.75;color:var(--sumi-soft);text-align:center;letter-spacing:.04em;
+}
+.female-tag{
+  position:absolute;top:14px;right:14px;font-size:.6rem;letter-spacing:.08em;
+  color:var(--shu);border:1px solid rgba(176,58,46,.45);border-radius:2px;padding:2px 5px;
+}
+
+.done-box{
+  height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--card);border:1px solid var(--line);border-radius:4px;
+  box-shadow:0 6px 20px rgba(80,66,40,.10);
+}
+.done-mark{
+  width:96px;height:96px;border:2px solid var(--shu);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.6rem;color:var(--shu);transform:rotate(-8deg);margin-bottom:18px;
+}
+.done-box p{margin:4px 0;font-size:.86rem;letter-spacing:.1em;color:var(--sumi-soft)}
+.done-box .done-sub{font-size:.74rem;color:#a89c85}
+
+/* ── ボタン ── */
+.actions{display:flex;gap:10px}
+.btn{
+  flex:1;font-family:inherit;font-size:.92rem;letter-spacing:.16em;cursor:pointer;
+  padding:14px 0;border-radius:3px;border:1px solid var(--line);
+  background:var(--card);color:var(--sumi);
+  transition:transform .12s,background .2s,box-shadow .2s;
+}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--shu);border-color:var(--shu);color:#fff8f2;box-shadow:0 3px 0 rgba(140,45,34,.32)}
+.btn.wide{width:100%;margin-top:14px}
+
+/* ── クイズ ── */
+.score{font-size:.74rem;letter-spacing:.1em;color:var(--sumi-soft);white-space:nowrap}
+.score b{font-size:1.1rem;color:var(--shu);letter-spacing:0;margin:0 .1em}
+.qbox{
+  position:relative;padding:26px 20px 22px;background:var(--card);
+  border:1px solid var(--line);border-radius:4px;
+  box-shadow:0 6px 20px rgba(80,66,40,.10);
+}
+.q-text{margin:0 0 20px;text-align:center;font-size:1rem;letter-spacing:.08em;line-height:1.8;min-height:2.6em;display:flex;align-items:center;justify-content:center}
+.q-text b{font-size:1.5em;color:var(--shu);margin:0 .1em;letter-spacing:0}
+.choices{display:flex;flex-direction:column;gap:9px}
+.choice{
+  font-family:inherit;font-size:.98rem;letter-spacing:.08em;color:var(--sumi);
+  padding:15px 12px;border:1px solid var(--line);border-radius:3px;
+  background:#fffdf8;cursor:pointer;text-align:center;
+  transition:transform .12s,background .2s,border-color .2s,color .2s;
+}
+.choice:active{transform:scale(.985)}
+.choice:disabled{cursor:default}
+.choice.correct{background:#eef4ec;border-color:#7a9b6e;color:#2f5526}
+.choice.wrong{background:#fbeceb;border-color:var(--shu-soft);color:#8e2c22}
+
+.stamp{
+  position:absolute;left:50%;top:50%;width:88px;height:88px;margin:-44px 0 0 -44px;
+  display:flex;align-items:center;justify-content:center;pointer-events:none;
+  border:2.5px solid var(--shu);border-radius:50%;color:var(--shu);
+  font-size:.84rem;font-weight:700;letter-spacing:.06em;
+  background:rgba(255,253,248,.72);
+  transform:rotate(-13deg) scale(0);opacity:0;
+  transition:transform .38s cubic-bezier(.2,1.6,.4,1),opacity .2s;
+}
+.stamp.show{transform:rotate(-13deg) scale(1);opacity:.95}
+.stamp.ng{border-color:#7a7469;color:#7a7469}
+
+/* ── 一覧 ── */
+.list-group{margin-bottom:22px}
+.list-group h3{
+  margin:0 0 8px;padding-bottom:6px;font-size:.78rem;font-weight:700;
+  letter-spacing:.24em;color:var(--kin);border-bottom:1px solid var(--line);
+}
+.row{display:flex;align-items:baseline;gap:8px;padding:7px 2px;border-bottom:1px dotted rgba(0,0,0,.07)}
+.row .no{font-size:.7rem;color:var(--shu);letter-spacing:.03em;min-width:3.6em}
+.row .nm{font-size:.9rem;letter-spacing:.05em}
+.f-tag{font-size:.58rem;color:var(--shu);border:1px solid rgba(176,58,46,.4);border-radius:2px;padding:0 4px;letter-spacing:.04em}
+.row .kn{margin-left:auto;font-size:.68rem;letter-spacing:.1em;color:var(--sumi-soft)}
+.empty{text-align:center;color:var(--sumi-soft);font-size:.84rem;padding:30px 0;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="site-head">
+    <h1>天皇陛下 暗記帖</h1>
+    <p class="sub">初代 神武天皇 より 第126代 今上天皇 まで</p>
+    <div class="rule"></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="learn">覚える</button>
+    <button class="tab" data-tab="quiz">試す</button>
+    <button class="tab" data-tab="list">一覧</button>
+  </nav>
+
+  <!-- 覚える -->
+  <section class="panel active" id="panel-learn">
+    <div class="controls">
+      <div class="select-wrap"><select id="eraSelect"><option value="all">全範囲（1〜126代）</option></select></div>
+      <label class="check"><input type="checkbox" id="femaleOnly">女帝のみ</label>
+    </div>
+    <div class="progress-row">
+      <span class="bar"><i id="learnBar"></i></span>
+      <span id="learnCount">0 / 0</span>
+    </div>
+    <div id="cardWrap"></div>
+    <div class="actions" id="learnActions"></div>
+  </section>
+
+  <!-- 試す -->
+  <section class="panel" id="panel-quiz">
+    <div class="controls">
+      <div class="select-wrap"><select id="quizEra"><option value="all">全範囲（1〜126代）</option></select></div>
+      <div class="score" id="quizScore">正解 <b>0</b> <span>/ 0</span></div>
+    </div>
+    <div class="qbox" id="quizBox"></div>
+    <button class="btn primary wide" id="nextBtn" hidden>次の問題</button>
+  </section>
+
+  <!-- 一覧 -->
+  <section class="panel" id="panel-list">
+    <div class="select-wrap" style="margin-bottom:16px">
+      <input id="searchInput" type="search" placeholder="名前・読み・代数で検索">
+    </div>
+    <div id="listBody"></div>
+  </section>
+
+</div>
+
+<script>
+/* ── データ ── */
+const RAW = [
+["神武","じんむ"],["綏靖","すいぜい"],["安寧","あんねい"],["懿徳","いとく"],["孝昭","こうしょう"],
+["孝安","こうあん"],["孝霊","こうれい"],["孝元","こうげん"],["開化","かいか"],["崇神","すじん"],
+["垂仁","すいにん"],["景行","けいこう"],["成務","せいむ"],["仲哀","ちゅうあい"],["応神","おうじん"],
+["仁徳","にんとく"],["履中","りちゅう"],["反正","はんぜい"],["允恭","いんぎょう"],["安康","あんこう"],
+["雄略","ゆうりゃく"],["清寧","せいねい"],["顕宗","けんぞう"],["仁賢","にんけん"],["武烈","ぶれつ"],
+["継体","けいたい"],["安閑","あんかん"],["宣化","せんか"],["欽明","きんめい"],["敏達","びだつ"],
+["用明","ようめい"],["崇峻","すしゅん"],["推古","すいこ"],["舒明","じょめい"],["皇極","こうぎょく"],
+["孝徳","こうとく"],["斉明","さいめい"],["天智","てんじ"],["弘文","こうぶん"],["天武","てんむ"],
+["持統","じとう"],["文武","もんむ"],["元明","げんめい"],["元正","げんしょう"],["聖武","しょうむ"],
+["孝謙","こうけん"],["淳仁","じゅんにん"],["称徳","しょうとく"],["光仁","こうにん"],["桓武","かんむ"],
+["平城","へいぜい"],["嵯峨","さが"],["淳和","じゅんな"],["仁明","にんみょう"],["文徳","もんとく"],
+["清和","せいわ"],["陽成","ようぜい"],["光孝","こうこう"],["宇多","うだ"],["醍醐","だいご"],
+["朱雀","すざく"],["村上","むらかみ"],["冷泉","れいぜい"],["円融","えんゆう"],["花山","かざん"],
+["一条","いちじょう"],["三条","さんじょう"],["後一条","ごいちじょう"],["後朱雀","ごすざく"],["後冷泉","ごれいぜい"],
+["後三条","ごさんじょう"],["白河","しらかわ"],["堀河","ほりかわ"],["鳥羽","とば"],["崇徳","すとく"],
+["近衛","このえ"],["後白河","ごしらかわ"],["二条","にじょう"],["六条","ろくじょう"],["高倉","たかくら"],
+["安徳","あんとく"],["後鳥羽","ごとば"],["土御門","つちみかど"],["順徳","じゅんとく"],["仲恭","ちゅうきょう"],
+["後堀河","ごほりかわ"],["四条","しじょう"],["後嵯峨","ごさが"],["後深草","ごふかくさ"],["亀山","かめやま"],
+["後宇多","ごうだ"],["伏見","ふしみ"],["後伏見","ごふしみ"],["後二条","ごにじょう"],["花園","はなぞの"],
+["後醍醐","ごだいご"],["後村上","ごむらかみ"],["長慶","ちょうけい"],["後亀山","ごかめやま"],["後小松","ごこまつ"],
+["称光","しょうこう"],["後花園","ごはなぞの"],["後土御門","ごつちみかど"],["後柏原","ごかしわばら"],["後奈良","ごなら"],
+["正親町","おおぎまち"],["後陽成","ごようぜい"],["後水尾","ごみずのお"],["明正","めいしょう"],["後光明","ごこうみょう"],
+["後西","ごさい"],["霊元","れいげん"],["東山","ひがしやま"],["中御門","なかみかど"],["桜町","さくらまち"],
+["桃園","ももぞの"],["後桜町","ごさくらまち"],["後桃園","ごももぞの"],["光格","こうかく"],["仁孝","にんこう"],
+["孝明","こうめい"],["明治","めいじ"],["大正","たいしょう"],["昭和","しょうわ"],["上皇","じょうこう"],["今上天皇","きんじょう"]
+];
+
+const FEMALE = new Set([33,35,37,41,43,44,46,48,109,117]);
+
+const NOTES = {
+  1:"初代。神話に語られる天皇",
+  10:"実在性が高いとされる最初の天皇",
+  15:"応神天皇。八幡神として崇敬される",
+  21:"雄略天皇。稲荷山鉄剣の銘文",
+  26:"継体天皇。皇統の分岐点",
+  33:"初の女性天皇（女帝）",
+  36:"孝徳天皇。大化の改新",
+  38:"天智天皇。白村江の戦い",
+  40:"天武天皇。壬申の乱を制す",
+  41:"持統天皇。初の太上天皇",
+  45:"聖武天皇。奈良の大仏",
+  50:"桓武天皇。平安京遷都",
+  52:"嵯峨天皇。空海・最澄を重用",
+  60:"醍醐天皇。延喜の治",
+  72:"白河天皇。院政を開始",
+  77:"後白河天皇。源平の動乱",
+  81:"安徳天皇。壇ノ浦に入水",
+  82:"後鳥羽天皇。承久の乱",
+  96:"後醍醐天皇。建武の新政",
+  99:"後亀山天皇。南北朝合一",
+  106:"正親町天皇。織田信長の時代",
+  108:"後水尾天皇。徳川初期",
+  122:"明治天皇。明治維新",
+  123:"大正天皇。大正デモクラシー",
+  124:"昭和天皇。戦争と復興",
+  125:"上皇陛下。平成の三十年",
+  126:"今上天皇。令和"
+};
+
+const ERA_ORDER = ["伝承","古墳","飛鳥・奈良","平安","鎌倉・南北朝","室町・戦国","江戸","近代・現代"];
+function eraOf(n){
+  if(n<=14) return "伝承";
+  if(n<=33) return "古墳";
+  if(n<=49) return "飛鳥・奈良";
+  if(n<=81) return "平安";
+  if(n<=99) return "鎌倉・南北朝";
+  if(n<=106) return "室町・戦国";
+  if(n<=120) return "江戸";
+  return "近代・現代";
+}
+
+const EMPERORS = RAW.map((r,i)=>({
+  n:i+1, name:r[0], kana:r[1], era:eraOf(i+1),
+  female:FEMALE.has(i+1), note:NOTES[i+1]||""
+}));
+
+function shortName(e){
+  if(e.n===125) return "上皇陛下";
+  if(e.n===126) return "今上天皇";
+  return e.name+"天皇";
+}
+function fullName(e){
+  if(e.n===125) return "上皇陛下（明仁）";
+  if(e.n===126) return "今上天皇（徳仁）";
+  return e.name+"天皇";
+}
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+const rand = a => a[Math.floor(Math.random()*a.length)];
+
+/* ── タブ ── */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+  });
+});
+
+/* ── セレクト生成 ── */
+['eraSelect','quizEra'].forEach(id=>{
+  const sel = document.getElementById(id);
+  ERA_ORDER.forEach(era=>{
+    const o = document.createElement('option');
+    o.value = era; o.textContent = era;
+    sel.appendChild(o);
+  });
+});
+
+/* ── 覚えるモード ── */
+const learn = {
+  queue: [], total: 0, flipped: false,
+  learned: new Set(JSON.parse(localStorage.getItem('tenno_learned')||'[]'))
+};
+function saveLearned(){
+  try{ localStorage.setItem('tenno_learned', JSON.stringify([...learn.learned])); }catch(e){}
+}
+
+function buildLearnPool(){
+  const era = document.getElementById('eraSelect').value;
+  const femaleOnly = document.getElementById('femaleOnly').checked;
+  let list = EMPERORS.filter(e => (era==='all' || e.era===era) && (!femaleOnly || e.female));
+  learn.queue = shuffle(list.slice());
+  learn.total = learn.queue.length;
+  learn.flipped = false;
+  renderLearn();
+}
+
+function renderLearn(){
+  const left = learn.queue.length;
+  const pos = learn.total - left;
+  document.getElementById('learnCount').textContent = `${pos} / ${learn.total}`;
+  document.getElementById('learnBar').style.width = (learn.total ? (pos/learn.total*100) : 0) + '%';
+
+  const wrap = document.getElementById('cardWrap');
+  const act  = document.getElementById('learnActions');
+
+  if(!left){
+    wrap.innerHTML = `
+      <div class="done-box">
+        <div class="done-mark">了</div>
+        <p>この範囲は一周しました</p>
+        <p class="done-sub">覚えた数 ${learn.total} ／ ${learn.total}</p>
+      </div>`;
+    act.innerHTML = `<button class="btn primary" data-act="restart">もう一周する</button>`;
+    return;
+  }
+
+  const e = learn.queue[0];
+  wrap.innerHTML = `
+    <div class="card${learn.flipped?' flipped':''}" id="card">
+      <div class="face front">
+        <span class="era-badge">${e.era}</span>
+        <div class="dai">第 <b>${e.n}</b> 代</div>
+        <div class="tap-hint">タップしてめくる</div>
+      </div>
+      <div class="face back">
+        <div class="name">${fullName(e)}</div>
+        <div class="kana">${e.kana}</div>
+        ${e.note ? `<div class="note">${e.note}</div>` : ''}
+        ${e.female ? '<span class="female-tag">女帝</span>' : ''}
+      </div>
+    </div>`;
+
+  act.innerHTML = `
+    <button class="btn" data-act="again">もう一度</button>
+    <button class="btn primary" data-act="known">覚えた</button>`;
+}
+
+document.getElementById('cardWrap').addEventListener('click', ev=>{
+  const card = ev.target.closest('.card');
+  if(!card) return;
+  card.classList.toggle('flipped');
+  learn.flipped = card.classList.contains('flipped');
+});
+
+document.getElementById('learnActions').addEventListener('click', ev=>{
+  const b = ev.target.closest('button');
+  if(!b) return;
+  const act = b.dataset.act;
+
+  if(act === 'restart'){ buildLearnPool(); return; }
+  if(!learn.queue.length) return;
+
+  if(act === 'known'){
+    learn.learned.add(learn.queue[0].n);
+    saveLearned();
+    learn.queue.shift();
+  }else if(act === 'again'){
+    learn.queue.push(learn.queue.shift());
+  }
+  learn.flipped = false;
+  renderLearn();
+});
+
+document.getElementById('eraSelect').addEventListener('change', buildLearnPool);
+document.getElementById('femaleOnly').addEventListener('change', buildLearnPool);
+
+/* ── クイズモード ── */
+const quiz = { pool: [], current: null, answered: false, correct: 0, total: 0 };
+
+function startQuiz(){
+  const era = document.getElementById('quizEra').value;
+  quiz.pool = EMPERORS.filter(e => era==='all' || e.era===era);
+  quiz.correct = 0; quiz.total = 0;
+  newQuestion();
+}
+
+function pickDistractors(e, k){
+  const src = quiz.pool.filter(x => x.n !== e.n);
+  const arr = shuffle(src.slice()).slice(0, k);
+  if(arr.length < k){
+    const rest = shuffle(EMPERORS.filter(x => x.n !== e.n && !arr.includes(x)));
+    while(arr.length < k && rest.length) arr.push(rest.pop());
+  }
+  return arr;
+}
+
+function newQuestion(){
+  const e = rand(quiz.pool);
+  const type = Math.random() < 0.5 ? 'name' : 'num';
+  let answer, choices;
+
+  if(type === 'name'){
+    answer = shortName(e);
+    choices = shuffle(pickDistractors(e,3).map(shortName).concat(answer));
+  }else{
+    answer = e.n;
+    choices = shuffle(pickDistractors(e,3).map(x=>x.n).concat(answer));
+  }
+  quiz.current = { e, type, answer, choices };
+  quiz.answered = false;
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const c = quiz.current;
+  document.getElementById('quizScore').innerHTML =
+    `正解 <b>${quiz.correct}</b> <span>/ ${quiz.total}</span>`;
+
+  const qText = c.type === 'name'
+    ? `第 <b>${c.e.n}</b> 代の天皇は？`
+    : `「<b>${shortName(c.e)}</b>」は第何代？`;
+
+  const choicesHtml = c.choices.map((ch,i)=>{
+    const label = c.type === 'name' ? ch : `第 ${ch} 代`;
+    return `<button class="choice" data-i="${i}">${label}</button>`;
+  }).join('');
+
+  document.getElementById('quizBox').innerHTML = `
+    <p class="q-text">${qText}</p>
+    <div class="choices">${choicesHtml}</div>
+    <div class="stamp" id="stamp"></div>`;
+
+  document.getElementById('nextBtn').hidden = true;
+}
+
+document.getElementById('quizBox').addEventListener('click', ev=>{
+  const btn = ev.target.closest('.choice');
+  if(!btn || quiz.answered) return;
+  quiz.answered = true;
+
+  const c = quiz.current;
+  const chosen = c.choices[+btn.dataset.i];
+  const ok = chosen === c.answer;
+
+  quiz.total++;
+  if(ok) quiz.correct++;
+
+  document.querySelectorAll('#quizBox .choice').forEach(b=>{
+    b.disabled = true;
+    const v = c.choices[+b.dataset.i];
+    if(v === c.answer) b.classList.add('correct');
+    else if(b === btn) b.classList.add('wrong');
+  });
+
+  const stamp = document.getElementById('stamp');
+  stamp.textContent = ok ? '正解' : '不正解';
+  stamp.classList.add('show');
+  if(!ok) stamp.classList.add('ng');
+
+  document.getElementById('quizScore').innerHTML =
+    `正解 <b>${quiz.correct}</b> <span>/ ${quiz.total}</span>`;
+
+  document.getElementById('nextBtn').hidden = false;
+});
+
+document.getElementById('nextBtn').addEventListener('click', newQuestion);
+document.getElementById('quizEra').addEventListener('change', startQuiz);
+
+/* ── 一覧モード ── */
+function renderList(filter){
+  const f = (filter||'').trim();
+  let html = '';
+  ERA_ORDER.forEach(era=>{
+    const items = EMPERORS.filter(e => e.era === era && (
+      !f || e.name.includes(f) || e.kana.includes(f) ||
+      String(e.n) === f || fullName(e).includes(f)
+    ));
+    if(!items.length) return;
+    html += `<div class="list-group"><h3>${era}</h3>`;
+    items.forEach(e=>{
+      html += `<div class="row">
+        <span class="no">第${e.n}代</span>
+        <span class="nm">${fullName(e)}</span>
+        ${e.female?'<span class="f-tag">女帝</span>':''}
+        <span class="kn">${e.kana}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('listBody').innerHTML =
+    html || '<p class="empty">該当する天皇はありません</p>';
+}
+document.getElementById('searchInput').addEventListener('input', e=>{
+  renderList(e.target.value);
+});
+
+/* ── 起動 ── */
+buildLearnPool();
+startQuiz();
+renderList('');
+</script>
+</body>
+</html>
