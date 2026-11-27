@@ -1,577 +1,3194 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f6f1e6">
-<title>天皇陛下 暗記帖</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Old+Mincho:wght@700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大富豪 - DAIFUGO ONLINE</title>
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
 <style>
-:root{
-  --washi:#f6f1e6;
-  --card:#fffdf8;
-  --sumi:#2a2724;
-  --sumi-soft:#6b6357;
-  --shu:#b03a2e;
-  --shu-soft:#c9634f;
-  --kin:#b08d3f;
-  --line:#ddd3bd;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;
-  font-family:"Shippori Mincho","Yu Mincho","Hiragino Mincho ProN",serif;
-  color:var(--sumi);
-  background-color:var(--washi);
-  background-image:
-    radial-gradient(circle at 12% 4%, rgba(255,255,255,.85), transparent 55%),
-    radial-gradient(circle at 88% 96%, rgba(206,188,155,.35), transparent 60%);
-  min-height:100vh;
-  padding-bottom:48px;
-  -webkit-font-smoothing:antialiased;
-}
-body::before{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
-}
-.app{position:relative;z-index:1;max-width:460px;margin:0 auto;padding:0 18px}
+  :root {
+    --table-felt-center: #165b3d;
+    --table-felt-mid: #0e422b;
+    --table-felt-edge: #062115;
+    --modal-bg-top: #102a1d;
+    --modal-bg-bot: #08150e;
+    --gold: #d4af37;
+    --gold-bright: #f3d778;
+    --card-w: clamp(82px, 11.2vh, 120px);
+    --card-h: calc(var(--card-w) * 1.4);
+    --cpu-card-w: clamp(48px, 6.2vh, 64px);
+    --cpu-card-h: calc(var(--cpu-card-w) * 1.4);
+  }
 
-/* ── 題字 ── */
-.site-head{text-align:center;padding:30px 0 0}
-.site-head h1{
-  font-family:"Zen Old Mincho","Shippori Mincho",serif;
-  font-size:1.55rem;letter-spacing:.24em;margin:0 0 8px;font-weight:700;text-indent:.24em;
-}
-.site-head .sub{font-size:.7rem;letter-spacing:.14em;color:var(--sumi-soft);margin:0}
-.rule{height:1px;margin:16px 0 0;background:linear-gradient(90deg,transparent,var(--line) 12%,var(--line) 88%,transparent)}
+  body[data-theme="emerald"] {
+    --table-felt-center: #165b3d;
+    --table-felt-mid: #0e422b;
+    --table-felt-edge: #062115;
+    --modal-bg-top: #102a1d;
+    --modal-bg-bot: #08150e;
+    --gold: #d4af37;
+    --gold-bright: #f3d778;
+  }
+  body[data-theme="navy"] {
+    --table-felt-center: #183a63;
+    --table-felt-mid: #102744;
+    --table-felt-edge: #071324;
+    --modal-bg-top: #11243d;
+    --modal-bg-bot: #08121f;
+    --gold: #7dd3fc;
+    --gold-bright: #bae6fd;
+  }
+  body[data-theme="crimson"] {
+    --table-felt-center: #631823;
+    --table-felt-mid: #440f17;
+    --table-felt-edge: #21060b;
+    --modal-bg-top: #381017;
+    --modal-bg-bot: #1c070b;
+    --gold: #e5b869;
+    --gold-bright: #fde68a;
+  }
+  body[data-theme="obsidian"] {
+    --table-felt-center: #27292e;
+    --table-felt-mid: #17181c;
+    --table-felt-edge: #090a0c;
+    --modal-bg-top: #1e2024;
+    --modal-bg-bot: #0f1012;
+    --gold: #d4af37;
+    --gold-bright: #f7df8b;
+  }
+  body[data-theme="amethyst"] {
+    --table-felt-center: #45215c;
+    --table-felt-mid: #2c143d;
+    --table-felt-edge: #14081f;
+    --modal-bg-top: #291438;
+    --modal-bg-bot: #14091c;
+    --gold: #e2b6ff;
+    --gold-bright: #f3e8ff;
+  }
 
-/* ── タブ ── */
-.tabs{display:flex;margin:18px 0 18px;border-bottom:1px solid var(--line)}
-.tab{
-  flex:1;appearance:none;background:none;border:0;cursor:pointer;position:relative;
-  font-family:inherit;font-size:.95rem;letter-spacing:.16em;color:var(--sumi-soft);
-  padding:11px 0 12px;transition:color .2s;
-}
-.tab.active{color:var(--sumi);font-weight:700}
-.tab.active::after{content:"";position:absolute;left:18%;right:18%;bottom:-1px;height:2px;background:var(--shu);border-radius:2px}
+  * {
+    box-sizing: border-box;
+    user-select: none;
+  }
 
-.panel{display:none}
-.panel.active{display:block;animation:fade .35s ease}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #050706;
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    color: #f0ece1;
+  }
 
-/* ── 操作部品 ── */
-.controls{display:flex;gap:10px;align-items:center;margin-bottom:14px}
-.select-wrap{position:relative;flex:1}
-.select-wrap::after{content:"▾";position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--kin);font-size:.7rem;pointer-events:none}
-select,input[type=search]{
-  width:100%;font-family:inherit;font-size:.84rem;letter-spacing:.08em;color:var(--sumi);
-  padding:11px 32px 11px 12px;border:1px solid var(--line);border-radius:3px;
-  background:var(--card);appearance:none;outline:none;
-}
-input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none}
-select:focus,input:focus{border-color:var(--kin)}
-.check{display:flex;align-items:center;gap:6px;font-size:.76rem;letter-spacing:.06em;color:var(--sumi-soft);white-space:nowrap;cursor:pointer}
-.check input{accent-color:var(--shu);width:15px;height:15px}
+  .view {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .view.active {
+    display: block;
+  }
 
-/* ── 進捗 ── */
-.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.bar{flex:1;height:3px;background:rgba(0,0,0,.07);border-radius:2px;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--kin),var(--shu));transition:width .4s ease}
-.progress-row span{font-size:.7rem;letter-spacing:.1em;color:var(--sumi-soft);min-width:3.6em;text-align:right}
+  /* =========================================================
+     1. メニュー画面
+     ========================================================= */
+  .menu-screen {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #050606;
+  }
 
-/* ── カード ── */
-#cardWrap{perspective:1400px;margin-bottom:16px}
-.card{
-  position:relative;width:100%;height:300px;cursor:pointer;
-  transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.8,.4,1);
-}
-.card.flipped{transform:rotateY(180deg)}
-.face{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;padding:24px;overflow:hidden;
-  background:var(--card);border:1px solid var(--line);border-radius:4px;
-  box-shadow:0 6px 20px rgba(80,66,40,.10),inset 0 0 0 6px rgba(255,255,255,.6);
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;
-}
-.face::before,.face::after{content:"";position:absolute;width:26px;height:26px;opacity:.5}
-.face::before{top:10px;left:10px;border-top:1px solid var(--kin);border-left:1px solid var(--kin)}
-.face::after{bottom:10px;right:10px;border-bottom:1px solid var(--kin);border-right:1px solid var(--kin)}
-.face.back{transform:rotateY(180deg)}
+  .menu-bg-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(circle at 70% 45%, var(--table-felt-center) 0%, #050606 75%);
+  }
 
-.era-badge{
-  position:absolute;top:14px;left:50%;transform:translateX(-50%);
-  font-size:.66rem;letter-spacing:.2em;color:var(--kin);
-  border:1px solid rgba(176,141,63,.45);border-radius:2px;
-  padding:2px 10px 2px 12px;background:rgba(255,255,255,.5);white-space:nowrap;
-}
-.dai{font-size:1.5rem;letter-spacing:.1em;color:var(--sumi-soft)}
-.dai b{font-size:2.1em;color:var(--sumi);letter-spacing:.02em;margin:0 .06em}
-.tap-hint{position:absolute;bottom:18px;font-size:.68rem;letter-spacing:.18em;color:#b9ae98}
+  #menu-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 
-.name{font-size:1.75rem;letter-spacing:.06em;line-height:1.35;text-align:center}
-.kana{font-size:.8rem;letter-spacing:.24em;color:var(--sumi-soft);margin-top:10px;text-indent:.24em}
-.note{
-  margin-top:20px;padding-top:14px;border-top:1px dashed var(--line);
-  font-size:.8rem;line-height:1.75;color:var(--sumi-soft);text-align:center;letter-spacing:.04em;
-}
-.female-tag{
-  position:absolute;top:14px;right:14px;font-size:.6rem;letter-spacing:.08em;
-  color:var(--shu);border:1px solid rgba(176,58,46,.45);border-radius:2px;padding:2px 5px;
-}
+  .menu-fog-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(4, 5, 5, 0.99) 0%,
+        rgba(4, 5, 5, 0.95) 22%,
+        rgba(4, 5, 5, 0.78) 42%,
+        rgba(4, 5, 5, 0.36) 66%,
+        rgba(4, 5, 5, 0.08) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.45) 0%,
+        transparent 22%,
+        transparent 76%,
+        rgba(0, 0, 0, 0.6) 100%
+      );
+    pointer-events: none;
+  }
 
-.done-box{
-  height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:var(--card);border:1px solid var(--line);border-radius:4px;
-  box-shadow:0 6px 20px rgba(80,66,40,.10);
-}
-.done-mark{
-  width:96px;height:96px;border:2px solid var(--shu);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:2.6rem;color:var(--shu);transform:rotate(-8deg);margin-bottom:18px;
-}
-.done-box p{margin:4px 0;font-size:.86rem;letter-spacing:.1em;color:var(--sumi-soft)}
-.done-box .done-sub{font-size:.74rem;color:#a89c85}
+  .menu-fog-blur {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 44%;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    mask-image: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,0) 100%);
+    -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,0) 100%);
+    pointer-events: none;
+  }
 
-/* ── ボタン ── */
-.actions{display:flex;gap:10px}
-.btn{
-  flex:1;font-family:inherit;font-size:.92rem;letter-spacing:.16em;cursor:pointer;
-  padding:14px 0;border-radius:3px;border:1px solid var(--line);
-  background:var(--card);color:var(--sumi);
-  transition:transform .12s,background .2s,box-shadow .2s;
-}
-.btn:active{transform:scale(.97)}
-.btn.primary{background:var(--shu);border-color:var(--shu);color:#fff8f2;box-shadow:0 3px 0 rgba(140,45,34,.32)}
-.btn.wide{width:100%;margin-top:14px}
+  .menu-sidebar {
+    position: relative;
+    z-index: 10;
+    width: min(480px, 54vw);
+    height: 100%;
+    padding: 0 48px 0 68px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
-/* ── クイズ ── */
-.score{font-size:.74rem;letter-spacing:.1em;color:var(--sumi-soft);white-space:nowrap}
-.score b{font-size:1.1rem;color:var(--shu);letter-spacing:0;margin:0 .1em}
-.qbox{
-  position:relative;padding:26px 20px 22px;background:var(--card);
-  border:1px solid var(--line);border-radius:4px;
-  box-shadow:0 6px 20px rgba(80,66,40,.10);
-}
-.q-text{margin:0 0 20px;text-align:center;font-size:1rem;letter-spacing:.08em;line-height:1.8;min-height:2.6em;display:flex;align-items:center;justify-content:center}
-.q-text b{font-size:1.5em;color:var(--shu);margin:0 .1em;letter-spacing:0}
-.choices{display:flex;flex-direction:column;gap:9px}
-.choice{
-  font-family:inherit;font-size:.98rem;letter-spacing:.08em;color:var(--sumi);
-  padding:15px 12px;border:1px solid var(--line);border-radius:3px;
-  background:#fffdf8;cursor:pointer;text-align:center;
-  transition:transform .12s,background .2s,border-color .2s,color .2s;
-}
-.choice:active{transform:scale(.985)}
-.choice:disabled{cursor:default}
-.choice.correct{background:#eef4ec;border-color:#7a9b6e;color:#2f5526}
-.choice.wrong{background:#fbeceb;border-color:var(--shu-soft);color:#8e2c22}
+  .menu-eyebrow {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 12px;
+    letter-spacing: 0.38em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.9;
+  }
 
-.stamp{
-  position:absolute;left:50%;top:50%;width:88px;height:88px;margin:-44px 0 0 -44px;
-  display:flex;align-items:center;justify-content:center;pointer-events:none;
-  border:2.5px solid var(--shu);border-radius:50%;color:var(--shu);
-  font-size:.84rem;font-weight:700;letter-spacing:.06em;
-  background:rgba(255,253,248,.72);
-  transform:rotate(-13deg) scale(0);opacity:0;
-  transition:transform .38s cubic-bezier(.2,1.6,.4,1),opacity .2s;
-}
-.stamp.show{transform:rotate(-13deg) scale(1);opacity:.95}
-.stamp.ng{border-color:#7a7469;color:#7a7469}
+  .menu-title {
+    margin: 0;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", Georgia, serif;
+    font-size: clamp(44px, 6.2vh, 66px);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    line-height: 1.1;
+    background: linear-gradient(180deg, #fffdf6 0%, #e7d8a8 65%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.85));
+  }
 
-/* ── 一覧 ── */
-.list-group{margin-bottom:22px}
-.list-group h3{
-  margin:0 0 8px;padding-bottom:6px;font-size:.78rem;font-weight:700;
-  letter-spacing:.24em;color:var(--kin);border-bottom:1px solid var(--line);
-}
-.row{display:flex;align-items:baseline;gap:8px;padding:7px 2px;border-bottom:1px dotted rgba(0,0,0,.07)}
-.row .no{font-size:.7rem;color:var(--shu);letter-spacing:.03em;min-width:3.6em}
-.row .nm{font-size:.9rem;letter-spacing:.05em}
-.f-tag{font-size:.58rem;color:var(--shu);border:1px solid rgba(176,58,46,.4);border-radius:2px;padding:0 4px;letter-spacing:.04em}
-.row .kn{margin-left:auto;font-size:.68rem;letter-spacing:.1em;color:var(--sumi-soft)}
-.empty{text-align:center;color:var(--sumi-soft);font-size:.84rem;padding:30px 0;letter-spacing:.1em}
+  .menu-subtitle {
+    margin: 10px 0 28px;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: rgba(232, 226, 212, 0.62);
+  }
+
+  .menu-profile-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 7px;
+    margin-bottom: 24px;
+    width: fit-content;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    font-size: 13px;
+    color: #efeae0;
+  }
+
+  .menu-divider {
+    width: 72px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    margin-bottom: 26px;
+  }
+
+  .menu-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 260px;
+  }
+
+  .menu-btn {
+    position: relative;
+    background: transparent;
+    border: none;
+    border-left: 2px solid rgba(212, 175, 55, 0.25);
+    color: #d6d0c4;
+    font-family: Georgia, "Times New Roman", "Yu Gothic", serif;
+    font-size: 20px;
+    letter-spacing: 0.12em;
+    text-align: left;
+    padding: 13px 20px;
+    cursor: pointer;
+    transition: all 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+  }
+
+  .menu-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: all 0.24s ease;
+  }
+
+  .menu-btn:hover {
+    color: #fffaf0;
+    border-left: 3px solid var(--gold-bright);
+    padding-left: 28px;
+  }
+
+  .menu-btn:hover::before {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .menu-btn.primary {
+    color: var(--gold-bright);
+    font-weight: 700;
+  }
+
+  .menu-btn .btn-sub {
+    display: block;
+    font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.42);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+
+  .menu-notice-toast {
+    position: fixed;
+    top: 24px;
+    right: 28px;
+    z-index: 3000;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: rgba(15, 18, 16, 0.92);
+    border: 1px solid var(--gold);
+    color: var(--gold-bright);
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .menu-notice-toast.show { opacity: 1; }
+
+  .avatar-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--gold), #6b5316);
+    color: #14120c;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+  }
+  .avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .avatar-circle.lg { width: 64px; height: 64px; font-size: 24px; border-width: 2px; border-color: var(--gold); }
+  .avatar-circle.md { width: 40px; height: 40px; font-size: 16px; }
+
+  /* =========================================================
+     2. フルスクリーン・ゲームテーブル
+     ========================================================= */
+  .table-felt {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 44%, rgba(255, 255, 255, 0.08) 0%, transparent 56%),
+      radial-gradient(ellipse at 50% 48%, var(--table-felt-center) 0%, var(--table-felt-mid) 58%, var(--table-felt-edge) 100%);
+    box-shadow: inset 0 0 110px rgba(0, 0, 0, 0.58);
+  }
+
+  .felt-texture {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.28;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
+  }
+
+  .felt-center-emblem {
+    position: absolute;
+    top: 39%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    height: 190px;
+    border-radius: 95px;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.14) 0%, transparent 75%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .felt-center-emblem span {
+    font-family: "Times New Roman", serif;
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    color: rgba(255, 255, 255, 0.18);
+  }
+
+  /* 左上HUD（状態ピルのみ） */
+  .table-hud-left {
+    position: fixed;
+    top: 14px;
+    left: 16px;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* 左下：ESC+S ヒント */
+  .table-shortcut-hint {
+    position: fixed;
+    bottom: 12px;
+    left: 16px;
+    z-index: 50;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.38);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+  }
+
+  .hud-btn {
+    background: rgba(8, 12, 10, 0.72);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    color: #e8e2d4;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .hud-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: var(--gold);
+  }
+
+  .rule-pill {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+    display: none;
+  }
+  .rule-pill.active { display: inline-flex; align-items: center; gap: 5px; }
+  .pill-rev { background: linear-gradient(135deg, #991b1b, #dc2626); border: 1px solid #fca5a5; color: #fff; }
+  .pill-bind { background: linear-gradient(135deg, #1e3a8a, #2563eb); border: 1px solid #93c5fd; color: #fff; }
+  .pill-11 { background: linear-gradient(135deg, #6b21a8, #9333ea); border: 1px solid #d8b4fe; color: #fff; }
+
+  /* 座席 */
+  .seat {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 10;
+  }
+  .seat-top { top: 14px; left: 50%; transform: translateX(-50%); }
+  .seat-left { left: 22px; top: 41%; transform: translateY(-50%); }
+  .seat-right { right: 22px; top: 41%; transform: translateY(-50%); }
+
+  .player-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px 4px 6px;
+    border-radius: 999px;
+    background: rgba(6, 10, 8, 0.76);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: #e8e2d4;
+    transition: all 0.25s ease;
+  }
+  .player-badge.clickable { cursor: pointer; }
+  .player-badge.clickable:hover { border-color: var(--gold-bright); transform: scale(1.04); }
+  .player-badge.is-turn {
+    border-color: var(--gold-bright);
+    background: rgba(20, 26, 22, 0.94);
+    box-shadow: 0 0 20px var(--gold);
+    color: #fff;
+  }
+  .player-badge .rank-tag {
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14); color: var(--gold-bright);
+  }
+  .player-badge .status-tag {
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14); color: #cbd5e1; display: none;
+  }
+  .player-badge .status-tag.show { display: inline-block; }
+  .player-badge .status-tag.win {
+    background: linear-gradient(135deg, var(--gold), #8a6914); color: #14120c;
+  }
+
+  .cpu-hand {
+    display: flex; align-items: center; justify-content: center; min-height: var(--cpu-card-h);
+  }
+  .cpu-hand .card-wrap {
+    width: var(--cpu-card-w); height: var(--cpu-card-h);
+    margin-left: calc(var(--cpu-card-w) * -0.64);
+  }
+  .cpu-hand .card-wrap:first-child { margin-left: 0; }
+  .seat-left .cpu-hand, .seat-right .cpu-hand {
+    flex-direction: column; min-height: 0; min-width: var(--cpu-card-h);
+  }
+  .seat-left .cpu-hand .card-wrap, .seat-right .cpu-hand .card-wrap {
+    margin-left: 0; margin-top: calc(var(--cpu-card-h) * -0.78); transform: rotate(90deg);
+  }
+  .seat-left .cpu-hand .card-wrap:first-child, .seat-right .cpu-hand .card-wrap:first-child { margin-top: 0; }
+
+  .table-center {
+    position: absolute; top: 39%; left: 50%; transform: translate(-50%, -50%);
+    display: flex; align-items: center; justify-content: center; z-index: 20;
+  }
+  .field-pile { position: relative; width: 340px; height: 190px; transition: opacity 0.28s ease, transform 0.28s ease; }
+  .field-pile.sweeping { opacity: 0; transform: translateX(120px) scale(0.9); }
+  .field-pile .card-wrap { position: absolute; left: 50%; top: 50%; }
+
+  /* カットイン */
+  .cutin-banner {
+    position: fixed; top: 39%; left: 50%; transform: translate(-50%, -50%) scale(0.82);
+    z-index: 1200; padding: 16px 64px; min-width: min(560px, 88vw); text-align: center;
+    background: linear-gradient(90deg, transparent, rgba(8, 10, 9, 0.92) 18%, rgba(8, 10, 9, 0.92) 82%, transparent);
+    border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold);
+    color: var(--gold-bright); font-family: "Hiragino Mincho ProN", Georgia, serif;
+    font-size: clamp(24px, 3.6vh, 34px); font-weight: 700; letter-spacing: 0.16em;
+    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.95); pointer-events: none; opacity: 0;
+    transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cutin-banner.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .cutin-banner.turn-you { border-color: var(--gold-bright); color: #fff7d6; }
+  .cutin-banner.turn-cpu { border-color: rgba(255, 255, 255, 0.55); color: #eef2f5; }
+  .cutin-banner.pass { border-color: rgba(148, 163, 184, 0.75); color: #cbd5e1; }
+  .cutin-banner.special {
+    border-color: #ef4444; color: #fde047;
+    background: linear-gradient(90deg, transparent, rgba(50, 10, 10, 0.94) 18%, rgba(50, 10, 10, 0.94) 82%, transparent);
+  }
+
+  .table-toast {
+    position: absolute; top: 21%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+    z-index: 60; padding: 7px 22px; border-radius: 999px;
+    background: rgba(10, 14, 12, 0.85); border: 1px solid var(--gold);
+    color: var(--gold-bright); font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+    opacity: 0; pointer-events: none; transition: all 0.22s ease;
+  }
+  .table-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+  /* 7渡しバー */
+  .seven-pass-bar {
+    display: none; align-items: center; justify-content: center; gap: 14px;
+    padding: 9px 20px; margin-bottom: 8px; border-radius: 12px;
+    background: rgba(20, 12, 4, 0.92); border: 1.5px solid var(--gold-bright);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65); z-index: 45;
+  }
+  .seven-pass-bar.active { display: flex; }
+  .seven-pass-text { font-size: 13px; font-weight: 700; color: var(--gold-bright); }
+  .seven-pass-confirm {
+    padding: 7px 18px; border-radius: 8px; border: 1px solid var(--gold-bright);
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    color: #161208; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .seven-pass-confirm:disabled {
+    background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.35); cursor: not-allowed;
+  }
+
+  /* 観戦視点切り替えバー（上がり後に表示） */
+  .spectate-bar {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 7px 14px;
+    margin-bottom: 8px;
+    border-radius: 999px;
+    background: rgba(8, 14, 11, 0.86);
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    z-index: 45;
+    flex-wrap: wrap;
+  }
+  .spectate-bar.active { display: flex; }
+  .spectate-label { font-size: 11px; color: var(--gold-bright); font-weight: 700; margin-right: 4px; }
+  .spectate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px 4px 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #dcd6ca;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .spectate-btn:hover { background: rgba(255, 255, 255, 0.16); }
+  .spectate-btn.active {
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    color: #14120c;
+    border-color: #fff;
+    font-weight: 700;
+  }
+
+  /* 下部ドック */
+  .bottom-dock {
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    z-index: 30; display: flex; flex-direction: column; align-items: center; width: 96%;
+  }
+
+  .action-controls {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    width: min(540px, 92vw); margin-bottom: 4px; z-index: 40;
+  }
+
+  .game-btn {
+    width: 100%; height: 40px; border-radius: 10px; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.05em; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.22);
+    transition: all 0.18s ease; display: flex; align-items: center; justify-content: center; white-space: nowrap;
+  }
+  .btn-play {
+    background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
+    color: #161208; border-color: var(--gold-bright); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  }
+  .btn-play:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.08); }
+  .btn-play:disabled {
+    background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.1); box-shadow: none; cursor: not-allowed;
+  }
+  .btn-sub {
+    background: rgba(8, 12, 10, 0.8); color: #efeae0;
+    border-color: rgba(255, 255, 255, 0.24); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+  .btn-sub:hover:not(:disabled) { background: rgba(255, 255, 255, 0.14); border-color: var(--gold); transform: translateY(-2px); }
+  .btn-sub:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .player-hand {
+    display: flex; justify-content: center; align-items: flex-end;
+    padding: 36px 20px 6px; perspective: 1200px; min-height: calc(var(--card-h) + 44px);
+  }
+  .player-hand .card-wrap {
+    margin-left: calc(var(--card-w) * -0.28);
+    transition: transform 0.2s cubic-bezier(0.2, 0.85, 0.3, 1), margin 0.2s ease; cursor: pointer;
+  }
+  .player-hand .card-wrap:first-child { margin-left: 0; }
+  .player-hand .card-wrap:hover { transform: translateY(-20px) scale(1.04) !important; z-index: 150 !important; }
+  .player-hand .card-wrap.selected { transform: translateY(-30px) scale(1.05) !important; }
+  .player-hand .card-wrap.selected .card-face {
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.65), 0 0 0 2.5px var(--gold-bright), 0 0 18px var(--gold);
+  }
+  .player-hand.spectating .card-wrap { cursor: default; }
+  .player-hand.spectating .card-wrap:hover { transform: translateY(-8px) !important; }
+
+  /* =========================================================
+     カードモデリング
+     ========================================================= */
+  .card-wrap { width: var(--card-w); height: var(--card-h); perspective: 900px; position: relative; }
+  .card-inner {
+    width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(0.3, 0.9, 0.3, 1);
+  }
+  .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute; inset: 0; border-radius: 8% / 5.7%;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(0, 0, 0, 0.14);
+  }
+  .card-front { background: linear-gradient(155deg, #ffffff 0%, #faf8f2 55%, #f2eee4 100%); }
+  .card-back { transform: rotateY(180deg); background: #fcfaf4; }
+  .card-paper-grain {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.12;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 3px),
+      repeating-linear-gradient(-45deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 3px);
+  }
+  .card-sheen {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.2s ease;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.08) 38%, transparent 70%);
+    mix-blend-mode: soft-light;
+  }
+  .card-wrap:hover .card-sheen { opacity: 1; }
+  .card-svg { width: 100%; height: 100%; display: block; }
+
+  .flying-layer { position: fixed; inset: 0; pointer-events: none; z-index: 1500; }
+
+  .card-tooltip {
+    position: fixed; z-index: 2500; transform: translate(-50%, -100%);
+    padding: 5px 12px; border-radius: 6px;
+    background: rgba(12, 14, 15, 0.94); border: 1px solid var(--gold);
+    color: #faf5e8; font-size: 13px; font-weight: 700; letter-spacing: 0.05em;
+    white-space: nowrap; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    pointer-events: none; opacity: 0; transition: opacity 0.15s ease;
+  }
+  .card-tooltip.visible { opacity: 1; }
+  .card-tooltip::after {
+    content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    border-width: 5px; border-style: solid; border-color: var(--gold) transparent transparent transparent;
+  }
+
+  /* =========================================================
+     3. モーダル共通＆サイズ統一
+     ========================================================= */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(4, 8, 6, 0.82); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal-box {
+    width: min(760px, 94vw); max-height: 88vh; overflow-y: auto;
+    background: linear-gradient(160deg, var(--modal-bg-top) 0%, var(--modal-bg-bot) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 16px;
+    padding: 24px 28px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+  }
+
+  /* プレイモード選択＆ONLINE選択を完全に同じ大きさに統一 */
+  .modal-choice-box {
+    width: min(580px, 94vw);
+    height: 310px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14); padding-bottom: 12px; margin-bottom: 18px;
+  }
+  .modal-header h3 { margin: 0; font-size: 17px; color: var(--gold-bright); letter-spacing: 0.08em; }
+  .modal-close-btn {
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer;
+  }
+  .modal-close-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+  .choice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; flex: 1; align-items: stretch; }
+  .choice-card {
+    padding: 24px 18px; border-radius: 14px;
+    background: rgba(0, 0, 0, 0.34); border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #f0ece1; cursor: pointer; text-align: center; transition: all 0.2s ease;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+  }
+  .choice-card:hover { border-color: var(--gold-bright); background: rgba(255, 255, 255, 0.08); transform: translateY(-3px); }
+  .choice-card .choice-title {
+    font-family: Georgia, serif; font-size: 24px; font-weight: 700;
+    letter-spacing: 0.12em; color: var(--gold-bright); margin-bottom: 8px;
+  }
+  .choice-card .choice-desc { font-size: 12px; color: #b7c2bc; }
+
+  .profile-editor {
+    display: flex; align-items: center; gap: 18px; padding: 16px;
+    background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .text-input {
+    background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 14px; outline: none;
+  }
+  .text-input:focus { border-color: var(--gold-bright); }
+
+  .theme-swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .theme-swatch {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3); border: 1.5px solid rgba(255, 255, 255, 0.15);
+    color: #e5e0d5; font-size: 12px; cursor: pointer; transition: all 0.18s;
+  }
+  .theme-swatch.active { border-color: var(--gold-bright); background: rgba(255, 255, 255, 0.1); }
+  .swatch-dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.4); }
+
+  .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px;
+  }
+  .setting-label { font-size: 13px; font-weight: 600; }
+  .setting-desc { font-size: 11px; color: #9cb2a6; margin-top: 2px; }
+
+  .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0; cursor: pointer; background: rgba(255, 255, 255, 0.16);
+    border-radius: 999px; transition: 0.2s;
+  }
+  .toggle-slider::before {
+    content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px;
+    border-radius: 50%; background: #fff; transition: 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-slider { background: linear-gradient(135deg, var(--gold-bright), var(--gold)); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+  .toggle-switch input:disabled + .toggle-slider { opacity: 0.5; cursor: not-allowed; }
+
+  .setting-select {
+    background: rgba(0, 0, 0, 0.45); color: #f0ece1;
+    border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 6px; padding: 5px 10px; font-size: 12px;
+  }
+
+  .room-id-banner {
+    display: flex; align-items: center; justify-content: space-between; padding: 14px 18px;
+    border-radius: 12px; background: rgba(0, 0, 0, 0.36); border: 1px solid var(--gold); margin-bottom: 16px;
+  }
+  .room-id-code { font-family: "Courier New", monospace; font-size: 30px; font-weight: 700; letter-spacing: 0.25em; color: var(--gold-bright); }
+  .lobby-seats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  .lobby-seat {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px;
+    background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .lobby-seat.filled { border-color: var(--gold); }
+  .lobby-seat-role { font-size: 11px; color: #9cb2a6; }
+
+  .exchange-banner {
+    display: none;
+    padding: 8px 14px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    background: rgba(212, 175, 55, 0.14);
+    border: 1px solid var(--gold);
+    color: var(--gold-bright);
+    font-size: 12px;
+  }
+  .exchange-banner.show { display: block; }
+
+  .join-id-input {
+    width: 220px; text-align: center; font-family: "Courier New", monospace;
+    font-size: 32px; font-weight: 700; letter-spacing: 0.3em; padding: 10px; border-radius: 10px;
+    background: rgba(0, 0, 0, 0.45); border: 1.5px solid var(--gold); color: var(--gold-bright); outline: none;
+  }
+
+  .error-text { color: #fca5a5; font-size: 12px; min-height: 18px; margin-top: 10px; }
+
+  .field-modal-group { margin-bottom: 18px; }
+  .field-modal-group-title { font-size: 12px; color: #b7c9bf; margin-bottom: 10px; }
+  .field-modal-cards { display: flex; flex-wrap: wrap; gap: 12px; min-height: 50px; align-items: center; }
+  .field-modal-cards .card-wrap { width: 92px; height: 128.8px; }
+
+  .result-list { display: flex; flex-direction: column; gap: 10px; margin: 18px 0 24px; }
+  .result-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-radius: 10px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .result-row.you { border-color: var(--gold-bright); background: rgba(255, 255, 255, 0.08); }
+  .result-rank-badge { font-weight: 700; font-size: 14px; color: var(--gold-bright); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+
+  .gallery-view {
+    height: 100%; overflow-y: auto; padding: 36px 40px 60px;
+    background: radial-gradient(ellipse at top, var(--table-felt-mid) 0%, #0b110e 65%, #070a09 100%);
+  }
+  .gallery-header {
+    max-width: 1280px; margin: 0 auto 24px; display: flex; justify-content: space-between;
+    align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.18); padding-bottom: 12px;
+  }
+  .gallery-section { max-width: 1280px; margin: 0 auto 36px; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); gap: 18px 14px; }
+  .gallery-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .gallery-item .card-wrap { width: 112px; height: 156.8px; cursor: pointer; transition: transform 0.2s ease; }
+  .gallery-item .card-wrap:hover { transform: translateY(-6px) scale(1.04); }
+  .gallery-label { font-size: 11px; color: #9ba8a1; }
 </style>
 </head>
-<body>
-<div class="app">
+<body data-theme="emerald">
 
-  <header class="site-head">
-    <h1>天皇陛下 暗記帖</h1>
-    <p class="sub">初代 神武天皇 より 第126代 今上天皇 まで</p>
-    <div class="rule"></div>
-  </header>
+  <!-- =========================================================
+       1. メニュー画面
+       ========================================================= -->
+  <div class="view active" id="view-menu">
+    <div class="menu-screen">
+      <div class="menu-bg-layer">
+        <img id="menu-bg-img" src="menu.jpg" alt="メニュー背景" onerror="this.style.display='none'">
+      </div>
+      <div class="menu-fog-blur"></div>
+      <div class="menu-fog-overlay"></div>
 
-  <nav class="tabs">
-    <button class="tab active" data-tab="learn">覚える</button>
-    <button class="tab" data-tab="quiz">試す</button>
-    <button class="tab" data-tab="list">一覧</button>
-  </nav>
+      <div class="menu-sidebar">
+        <div class="menu-eyebrow">Classic Card Table</div>
+        <h1 class="menu-title">大富豪</h1>
+        <p class="menu-subtitle">DAIFUGO — GRAND MILLIONAIRE</p>
 
-  <!-- 覚える -->
-  <section class="panel active" id="panel-learn">
-    <div class="controls">
-      <div class="select-wrap"><select id="eraSelect"><option value="all">全範囲（1〜126代）</option></select></div>
-      <label class="check"><input type="checkbox" id="femaleOnly">女帝のみ</label>
+        <div class="menu-profile-pill">
+          <div class="avatar-circle" id="menu-avatar-preview"></div>
+          <span id="menu-name-preview">プレイヤー</span>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <nav class="menu-nav">
+          <button class="menu-btn primary" id="btnMenuPlay">
+            Play
+            <span class="btn-sub">SINGLE / ONLINE 対戦</span>
+          </button>
+          <button class="menu-btn" id="btnMenuSettings">
+            Settings
+            <span class="btn-sub">名前・アイコン・テーマカラー</span>
+          </button>
+          <button class="menu-btn" id="btnMenuGallery">
+            Cards
+            <span class="btn-sub">全54枚トランプ一覧</span>
+          </button>
+          <button class="menu-btn" id="btnMenuQuit">
+            Quit
+            <span class="btn-sub">ゲームを終了</span>
+          </button>
+        </nav>
+      </div>
     </div>
-    <div class="progress-row">
-      <span class="bar"><i id="learnBar"></i></span>
-      <span id="learnCount">0 / 0</span>
-    </div>
-    <div id="cardWrap"></div>
-    <div class="actions" id="learnActions"></div>
-  </section>
+  </div>
 
-  <!-- 試す -->
-  <section class="panel" id="panel-quiz">
-    <div class="controls">
-      <div class="select-wrap"><select id="quizEra"><option value="all">全範囲（1〜126代）</option></select></div>
-      <div class="score" id="quizScore">正解 <b>0</b> <span>/ 0</span></div>
-    </div>
-    <div class="qbox" id="quizBox"></div>
-    <button class="btn primary wide" id="nextBtn" hidden>次の問題</button>
-  </section>
+  <div class="menu-notice-toast" id="menu-notice-toast"></div>
 
-  <!-- 一覧 -->
-  <section class="panel" id="panel-list">
-    <div class="select-wrap" style="margin-bottom:16px">
-      <input id="searchInput" type="search" placeholder="名前・読み・代数で検索">
-    </div>
-    <div id="listBody"></div>
-  </section>
+  <!-- =========================================================
+       2. ゲームテーブル画面（メニューボタンなし・ESC+Sで強制終了）
+       ========================================================= -->
+  <div class="view" id="view-table">
+    <div class="table-felt">
+      <div class="felt-texture"></div>
+      <div class="felt-center-emblem"><span>DAIFUGO</span></div>
 
-</div>
+      <!-- 左上HUD（特殊状態表示のみ） -->
+      <div class="table-hud-left">
+        <span class="rule-pill pill-rev" id="pill-rev">革命中</span>
+        <span class="rule-pill pill-bind" id="pill-bind"></span>
+        <span class="rule-pill pill-11" id="pill-11">11バック中</span>
+      </div>
+
+      <div class="table-shortcut-hint">ESC + S で強制終了（全員）</div>
+
+      <!-- 北（rel 2） -->
+      <div class="seat seat-top">
+        <div class="cpu-hand" id="rel-hand-2"></div>
+        <div class="player-badge" id="rel-badge-2" data-rel="2">
+          <div class="avatar-circle" id="rel-avatar-2"></div>
+          <span id="rel-name-2">CPU 2</span>
+          <span class="rank-tag" id="rel-count-2">13枚</span>
+          <span class="status-tag" id="rel-status-2"></span>
+        </div>
+      </div>
+
+      <!-- 西（rel 1） -->
+      <div class="seat seat-left">
+        <div class="cpu-hand" id="rel-hand-1"></div>
+        <div class="player-badge" id="rel-badge-1" data-rel="1">
+          <div class="avatar-circle" id="rel-avatar-1"></div>
+          <span id="rel-name-1">CPU 1</span>
+          <span class="rank-tag" id="rel-count-1">13枚</span>
+          <span class="status-tag" id="rel-status-1"></span>
+        </div>
+      </div>
+
+      <!-- 東（rel 3） -->
+      <div class="seat seat-right">
+        <div class="cpu-hand" id="rel-hand-3"></div>
+        <div class="player-badge" id="rel-badge-3" data-rel="3">
+          <div class="avatar-circle" id="rel-avatar-3"></div>
+          <span id="rel-name-3">CPU 3</span>
+          <span class="rank-tag" id="rel-count-3">13枚</span>
+          <span class="status-tag" id="rel-status-3"></span>
+        </div>
+      </div>
+
+      <!-- 中央場札 -->
+      <div class="table-center">
+        <div class="field-pile" id="field-pile"></div>
+      </div>
+
+      <!-- 通知 -->
+      <div class="table-toast" id="table-toast"></div>
+      <div class="cutin-banner" id="cutin-banner"></div>
+
+      <!-- 下部ドック -->
+      <div class="bottom-dock">
+        <!-- 上がり後の視点切り替え観戦バー -->
+        <div class="spectate-bar" id="spectate-bar"></div>
+
+        <!-- 7渡し指示バー -->
+        <div class="seven-pass-bar" id="seven-pass-bar">
+          <span class="seven-pass-text" id="seven-pass-text">渡すカードを選んでください</span>
+          <button class="seven-pass-confirm" id="btnConfirmSevenPass" disabled>カードをわたす</button>
+        </div>
+
+        <div class="action-controls">
+          <button class="game-btn btn-play" id="btnPlay" disabled>場に出す</button>
+          <button class="game-btn btn-sub" id="btnPass">パス</button>
+          <button class="game-btn btn-sub" id="btnCheckField">場のカード確認</button>
+        </div>
+
+        <div class="player-hand" id="player-hand"></div>
+
+        <div class="player-badge" id="rel-badge-0" data-rel="0">
+          <div class="avatar-circle" id="rel-avatar-0"></div>
+          <span id="rel-name-0">あなた</span>
+          <span class="rank-tag" id="rel-count-0">13枚</span>
+          <span class="status-tag" id="rel-status-0"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       3. トランプ一覧ギャラリー
+       ========================================================= -->
+  <div class="view" id="view-gallery">
+    <div class="gallery-view">
+      <div class="gallery-header">
+        <div>
+          <h2 style="margin:0;color:var(--gold-bright);">トランプ全種ギャラリー（52枚 ＋ ジョーカー2種 ＋ 裏面）</h2>
+          <p style="margin:4px 0 0;font-size:12px;color:#b7c2bc;">1秒ホバーで名称表示。クリックで裏返せます。</p>
+        </div>
+        <button class="hud-btn" id="btnGalleryBack">← メニューへ戻る</button>
+      </div>
+      <div id="gallery-sections"></div>
+    </div>
+  </div>
+
+  <div class="flying-layer" id="flying-layer"></div>
+  <div class="card-tooltip" id="card-tooltip"></div>
+
+  <!-- =========================================================
+       モーダル群
+       ========================================================= -->
+
+  <!-- Play：SINGLE / ONLINE 選択（サイズ統一） -->
+  <div class="modal-backdrop" id="play-mode-modal">
+    <div class="modal-box modal-choice-box">
+      <div class="modal-header" style="margin-bottom:14px;">
+        <h3>プレイモードを選択</h3>
+        <button class="modal-close-btn" id="btnClosePlayMode">戻る</button>
+      </div>
+      <div class="choice-grid">
+        <button class="choice-card" id="btnSelectSingle">
+          <div class="choice-title">SINGLE</div>
+          <div class="choice-desc">1人でCPU 3人と対戦する</div>
+        </button>
+        <button class="choice-card" id="btnSelectOnline">
+          <div class="choice-title">ONLINE</div>
+          <div class="choice-desc">最大4人でオンライン対戦する</div>
+        </button>
+      </div>
+      <div class="error-text"></div>
+    </div>
+  </div>
+
+  <!-- ONLINE：部屋を作る / 部屋に入る 選択（サイズ統一） -->
+  <div class="modal-backdrop" id="online-choice-modal">
+    <div class="modal-box modal-choice-box">
+      <div class="modal-header" style="margin-bottom:14px;">
+        <h3>ONLINE 対戦</h3>
+        <button class="modal-close-btn" id="btnBackFromOnlineChoice">戻る</button>
+      </div>
+      <div class="choice-grid">
+        <button class="choice-card" id="btnCreateRoom">
+          <div class="choice-title">部屋を作る</div>
+          <div class="choice-desc">4桁のIDを発行してルールを決める</div>
+        </button>
+        <button class="choice-card" id="btnOpenJoinRoom">
+          <div class="choice-title">部屋に入る</div>
+          <div class="choice-desc">4桁のIDを入力して参加する</div>
+        </button>
+      </div>
+      <div class="error-text" id="online-choice-error" style="text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- SINGLE用 ルール設定（待機画面） -->
+  <div class="modal-backdrop" id="single-rule-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>SINGLE 待機画面・ルール設定</h3>
+        <button class="modal-close-btn" id="btnBackFromSingleRule">戻る</button>
+      </div>
+      <div class="exchange-banner" id="single-exchange-banner">前回の対戦結果を引き継ぎます（開始時に階級ごとの自動カード交換を行います）</div>
+      <div id="single-rules-container"></div>
+      <div class="modal-actions">
+        <button class="game-btn btn-play" id="btnStartSingleGame" style="width:220px;">このルールで開始</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONLINE：部屋ID入力モーダル -->
+  <div class="modal-backdrop" id="online-join-modal">
+    <div class="modal-box" style="width:min(440px, 92vw);text-align:center;">
+      <div class="modal-header">
+        <h3>部屋に入る</h3>
+        <button class="modal-close-btn" id="btnBackFromJoin">戻る</button>
+      </div>
+      <p style="font-size:13px;color:#b8c7be;margin:0 0 16px;">ホストの画面に表示されている4桁の部屋IDを入力してください</p>
+      <input type="text" id="joinRoomIdInput" class="join-id-input" maxlength="4" inputmode="numeric" placeholder="0000">
+      <div class="error-text" id="join-error"></div>
+      <div class="modal-actions" style="justify-content:center;margin-top:16px;">
+        <button class="game-btn btn-play" id="btnDoJoinRoom" style="width:200px;">参加する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONLINE：待機ロビー -->
+  <div class="modal-backdrop" id="online-lobby-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="lobby-title">オンライン待機ロビー</h3>
+        <button class="modal-close-btn" id="btnLeaveLobby">退出する</button>
+      </div>
+
+      <div class="room-id-banner">
+        <div>
+          <div style="font-size:11px;color:#b8c7be;margin-bottom:2px;">部屋ID（友達に共有してください）</div>
+          <div class="room-id-code" id="lobby-room-id">----</div>
+        </div>
+        <button class="hud-btn" id="btnCopyRoomId">IDをコピー</button>
+      </div>
+
+      <div class="exchange-banner" id="online-exchange-banner">前回の対戦結果を引き継ぎます（開始時に階級ごとの自動カード交換を行います）</div>
+
+      <div style="font-size:12px;color:#b8c7be;margin-bottom:8px;">参加プレイヤー（空席はCPUが担当します）</div>
+      <div class="lobby-seats" id="lobby-seats"></div>
+
+      <div style="font-size:12px;color:var(--gold-bright);margin:14px 0 8px;" id="lobby-rules-heading">対戦ルール設定</div>
+      <div id="lobby-rules-container"></div>
+
+      <div class="error-text" id="lobby-error"></div>
+      <div class="modal-actions" id="lobby-actions">
+        <span id="guest-wait-msg" style="font-size:13px;color:#b8c7be;display:none;align-self:center;">ホストがゲームを開始するのを待っています…</span>
+        <button class="game-btn btn-play" id="btnStartOnlineGame" style="width:240px;">このメンバーで開始</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings（個人設定のみ） -->
+  <div class="modal-backdrop" id="settings-modal-backdrop">
+    <div class="modal-box" style="width:min(620px, 94vw);">
+      <div class="modal-header">
+        <h3>Settings（プロフィール・表示設定）</h3>
+        <button class="modal-close-btn" id="btnCloseSettings">保存して閉じる</button>
+      </div>
+
+      <div class="profile-editor">
+        <div class="avatar-circle lg" id="settings-avatar-preview"></div>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:12px;color:#b8c7be;margin-bottom:6px;">自分のプレイヤー名</div>
+          <input type="text" id="input-player-name" class="text-input" maxlength="12" style="width:100%;margin-bottom:10px;" placeholder="プレイヤー名">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+            <button class="hud-btn" id="btnUploadAvatar">アイコンをアップロード</button>
+            <button class="hud-btn" id="btnResetAvatar">初期アイコンに戻す</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;margin-bottom:14px;">
+        <div class="setting-label">テーマカラー</div>
+        <div class="theme-swatches" id="theme-swatches">
+          <button class="theme-swatch" data-theme="emerald"><span class="swatch-dot" style="background:#165b3d;"></span>エメラルド</button>
+          <button class="theme-swatch" data-theme="navy"><span class="swatch-dot" style="background:#183a63;"></span>ロイヤル紺</button>
+          <button class="theme-swatch" data-theme="crimson"><span class="swatch-dot" style="background:#631823;"></span>クリムゾン</button>
+          <button class="theme-swatch" data-theme="obsidian"><span class="swatch-dot" style="background:#27292e;"></span>オブシディアン</button>
+          <button class="theme-swatch" data-theme="amethyst"><span class="swatch-dot" style="background:#45215c;"></span>アメジスト</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">CPUの速度</div>
+          <div class="setting-desc">CPUの思考テンポ</div>
+        </div>
+        <select class="setting-select" id="opt-cpuSpeed">
+          <option value="500">速い</option>
+          <option value="800" selected>普通</option>
+          <option value="1200">ゆっくり</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 場のカード確認モーダル -->
+  <div class="modal-backdrop" id="field-modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>場のカード確認</h3>
+        <button class="modal-close-btn" id="btnCloseFieldModal">閉じる</button>
+      </div>
+      <div class="field-modal-group">
+        <div class="field-modal-group-title">現在 一番上に出ているカード</div>
+        <div class="field-modal-cards" id="modal-latest-cards"></div>
+      </div>
+      <div class="field-modal-group">
+        <div class="field-modal-group-title">この場でこれまでに出されたカード（履歴）</div>
+        <div class="field-modal-cards" id="modal-history-cards"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- リザルトモーダル -->
+  <div class="modal-backdrop" id="result-modal-backdrop">
+    <div class="modal-box" style="width:min(520px, 92vw);">
+      <div class="modal-header">
+        <h3>対戦結果</h3>
+      </div>
+      <div class="result-list" id="result-list"></div>
+      <div class="modal-actions">
+        <button class="hud-btn" id="btnResultMenu">メニューへ</button>
+        <span id="guest-next-wait" style="font-size:12px;color:#b8c7be;display:none;align-self:center;">ホストの操作を待っています…</span>
+        <button class="game-btn btn-play" id="btnNextRound" style="width:220px;">次のゲームへ（待機画面）</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quit確認モーダル -->
+  <div class="modal-backdrop" id="quit-modal-backdrop">
+    <div class="modal-box" style="width:min(420px, 90vw);text-align:center;">
+      <h3 style="margin:0 0 10px;color:var(--gold-bright);">ゲームを終了しますか？</h3>
+      <p style="font-size:13px;color:#b8c7be;margin:0 0 22px;">ブラウザで遊んでいる場合は、このタブを閉じて終了してください。</p>
+      <div class="modal-actions" style="justify-content:center;">
+        <button class="hud-btn" id="btnQuitCancel">メニューに戻る</button>
+        <button class="game-btn btn-play" id="btnQuitConfirm" style="width:140px;">終了する</button>
+      </div>
+    </div>
+  </div>
 
 <script>
-/* ── データ ── */
-const RAW = [
-["神武","じんむ"],["綏靖","すいぜい"],["安寧","あんねい"],["懿徳","いとく"],["孝昭","こうしょう"],
-["孝安","こうあん"],["孝霊","こうれい"],["孝元","こうげん"],["開化","かいか"],["崇神","すじん"],
-["垂仁","すいにん"],["景行","けいこう"],["成務","せいむ"],["仲哀","ちゅうあい"],["応神","おうじん"],
-["仁徳","にんとく"],["履中","りちゅう"],["反正","はんぜい"],["允恭","いんぎょう"],["安康","あんこう"],
-["雄略","ゆうりゃく"],["清寧","せいねい"],["顕宗","けんぞう"],["仁賢","にんけん"],["武烈","ぶれつ"],
-["継体","けいたい"],["安閑","あんかん"],["宣化","せんか"],["欽明","きんめい"],["敏達","びだつ"],
-["用明","ようめい"],["崇峻","すしゅん"],["推古","すいこ"],["舒明","じょめい"],["皇極","こうぎょく"],
-["孝徳","こうとく"],["斉明","さいめい"],["天智","てんじ"],["弘文","こうぶん"],["天武","てんむ"],
-["持統","じとう"],["文武","もんむ"],["元明","げんめい"],["元正","げんしょう"],["聖武","しょうむ"],
-["孝謙","こうけん"],["淳仁","じゅんにん"],["称徳","しょうとく"],["光仁","こうにん"],["桓武","かんむ"],
-["平城","へいぜい"],["嵯峨","さが"],["淳和","じゅんな"],["仁明","にんみょう"],["文徳","もんとく"],
-["清和","せいわ"],["陽成","ようぜい"],["光孝","こうこう"],["宇多","うだ"],["醍醐","だいご"],
-["朱雀","すざく"],["村上","むらかみ"],["冷泉","れいぜい"],["円融","えんゆう"],["花山","かざん"],
-["一条","いちじょう"],["三条","さんじょう"],["後一条","ごいちじょう"],["後朱雀","ごすざく"],["後冷泉","ごれいぜい"],
-["後三条","ごさんじょう"],["白河","しらかわ"],["堀河","ほりかわ"],["鳥羽","とば"],["崇徳","すとく"],
-["近衛","このえ"],["後白河","ごしらかわ"],["二条","にじょう"],["六条","ろくじょう"],["高倉","たかくら"],
-["安徳","あんとく"],["後鳥羽","ごとば"],["土御門","つちみかど"],["順徳","じゅんとく"],["仲恭","ちゅうきょう"],
-["後堀河","ごほりかわ"],["四条","しじょう"],["後嵯峨","ごさが"],["後深草","ごふかくさ"],["亀山","かめやま"],
-["後宇多","ごうだ"],["伏見","ふしみ"],["後伏見","ごふしみ"],["後二条","ごにじょう"],["花園","はなぞの"],
-["後醍醐","ごだいご"],["後村上","ごむらかみ"],["長慶","ちょうけい"],["後亀山","ごかめやま"],["後小松","ごこまつ"],
-["称光","しょうこう"],["後花園","ごはなぞの"],["後土御門","ごつちみかど"],["後柏原","ごかしわばら"],["後奈良","ごなら"],
-["正親町","おおぎまち"],["後陽成","ごようぜい"],["後水尾","ごみずのお"],["明正","めいしょう"],["後光明","ごこうみょう"],
-["後西","ごさい"],["霊元","れいげん"],["東山","ひがしやま"],["中御門","なかみかど"],["桜町","さくらまち"],
-["桃園","ももぞの"],["後桜町","ごさくらまち"],["後桃園","ごももぞの"],["光格","こうかく"],["仁孝","にんこう"],
-["孝明","こうめい"],["明治","めいじ"],["大正","たいしょう"],["昭和","しょうわ"],["上皇","じょうこう"],["今上天皇","きんじょう"]
-];
+(() => {
+  // =========================================================
+  // 0. 個人プロフィール
+  // =========================================================
+  const PROFILE_KEY = "daifugo_user_profile_v1";
+  let userProfile = { name: "プレイヤー", avatar: "", theme: "emerald", cpuSpeed: 800 };
+  try {
+    const saved = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
+    if (saved) userProfile = { ...userProfile, ...saved };
+  } catch (e) {}
 
-const FEMALE = new Set([33,35,37,41,43,44,46,48,109,117]);
-
-const NOTES = {
-  1:"初代。神話に語られる天皇",
-  10:"実在性が高いとされる最初の天皇",
-  15:"応神天皇。八幡神として崇敬される",
-  21:"雄略天皇。稲荷山鉄剣の銘文",
-  26:"継体天皇。皇統の分岐点",
-  33:"初の女性天皇（女帝）",
-  36:"孝徳天皇。大化の改新",
-  38:"天智天皇。白村江の戦い",
-  40:"天武天皇。壬申の乱を制す",
-  41:"持統天皇。初の太上天皇",
-  45:"聖武天皇。奈良の大仏",
-  50:"桓武天皇。平安京遷都",
-  52:"嵯峨天皇。空海・最澄を重用",
-  60:"醍醐天皇。延喜の治",
-  72:"白河天皇。院政を開始",
-  77:"後白河天皇。源平の動乱",
-  81:"安徳天皇。壇ノ浦に入水",
-  82:"後鳥羽天皇。承久の乱",
-  96:"後醍醐天皇。建武の新政",
-  99:"後亀山天皇。南北朝合一",
-  106:"正親町天皇。織田信長の時代",
-  108:"後水尾天皇。徳川初期",
-  122:"明治天皇。明治維新",
-  123:"大正天皇。大正デモクラシー",
-  124:"昭和天皇。戦争と復興",
-  125:"上皇陛下。平成の三十年",
-  126:"今上天皇。令和"
-};
-
-const ERA_ORDER = ["伝承","古墳","飛鳥・奈良","平安","鎌倉・南北朝","室町・戦国","江戸","近代・現代"];
-function eraOf(n){
-  if(n<=14) return "伝承";
-  if(n<=33) return "古墳";
-  if(n<=49) return "飛鳥・奈良";
-  if(n<=81) return "平安";
-  if(n<=99) return "鎌倉・南北朝";
-  if(n<=106) return "室町・戦国";
-  if(n<=120) return "江戸";
-  return "近代・現代";
-}
-
-const EMPERORS = RAW.map((r,i)=>({
-  n:i+1, name:r[0], kana:r[1], era:eraOf(i+1),
-  female:FEMALE.has(i+1), note:NOTES[i+1]||""
-}));
-
-function shortName(e){
-  if(e.n===125) return "上皇陛下";
-  if(e.n===126) return "今上天皇";
-  return e.name+"天皇";
-}
-function fullName(e){
-  if(e.n===125) return "上皇陛下（明仁）";
-  if(e.n===126) return "今上天皇（徳仁）";
-  return e.name+"天皇";
-}
-function shuffle(a){
-  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
-  return a;
-}
-const rand = a => a[Math.floor(Math.random()*a.length)];
-
-/* ── タブ ── */
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
-  });
-});
-
-/* ── セレクト生成 ── */
-['eraSelect','quizEra'].forEach(id=>{
-  const sel = document.getElementById(id);
-  ERA_ORDER.forEach(era=>{
-    const o = document.createElement('option');
-    o.value = era; o.textContent = era;
-    sel.appendChild(o);
-  });
-});
-
-/* ── 覚えるモード ── */
-const learn = {
-  queue: [], total: 0, flipped: false,
-  learned: new Set(JSON.parse(localStorage.getItem('tenno_learned')||'[]'))
-};
-function saveLearned(){
-  try{ localStorage.setItem('tenno_learned', JSON.stringify([...learn.learned])); }catch(e){}
-}
-
-function buildLearnPool(){
-  const era = document.getElementById('eraSelect').value;
-  const femaleOnly = document.getElementById('femaleOnly').checked;
-  let list = EMPERORS.filter(e => (era==='all' || e.era===era) && (!femaleOnly || e.female));
-  learn.queue = shuffle(list.slice());
-  learn.total = learn.queue.length;
-  learn.flipped = false;
-  renderLearn();
-}
-
-function renderLearn(){
-  const left = learn.queue.length;
-  const pos = learn.total - left;
-  document.getElementById('learnCount').textContent = `${pos} / ${learn.total}`;
-  document.getElementById('learnBar').style.width = (learn.total ? (pos/learn.total*100) : 0) + '%';
-
-  const wrap = document.getElementById('cardWrap');
-  const act  = document.getElementById('learnActions');
-
-  if(!left){
-    wrap.innerHTML = `
-      <div class="done-box">
-        <div class="done-mark">了</div>
-        <p>この範囲は一周しました</p>
-        <p class="done-sub">覚えた数 ${learn.total} ／ ${learn.total}</p>
-      </div>`;
-    act.innerHTML = `<button class="btn primary" data-act="restart">もう一周する</button>`;
-    return;
+  function saveUserProfile() {
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile)); } catch (e) {}
   }
 
-  const e = learn.queue[0];
-  wrap.innerHTML = `
-    <div class="card${learn.flipped?' flipped':''}" id="card">
-      <div class="face front">
-        <span class="era-badge">${e.era}</span>
-        <div class="dai">第 <b>${e.n}</b> 代</div>
-        <div class="tap-hint">タップしてめくる</div>
-      </div>
-      <div class="face back">
-        <div class="name">${fullName(e)}</div>
-        <div class="kana">${e.kana}</div>
-        ${e.note ? `<div class="note">${e.note}</div>` : ''}
-        ${e.female ? '<span class="female-tag">女帝</span>' : ''}
-      </div>
-    </div>`;
-
-  act.innerHTML = `
-    <button class="btn" data-act="again">もう一度</button>
-    <button class="btn primary" data-act="known">覚えた</button>`;
-}
-
-document.getElementById('cardWrap').addEventListener('click', ev=>{
-  const card = ev.target.closest('.card');
-  if(!card) return;
-  card.classList.toggle('flipped');
-  learn.flipped = card.classList.contains('flipped');
-});
-
-document.getElementById('learnActions').addEventListener('click', ev=>{
-  const b = ev.target.closest('button');
-  if(!b) return;
-  const act = b.dataset.act;
-
-  if(act === 'restart'){ buildLearnPool(); return; }
-  if(!learn.queue.length) return;
-
-  if(act === 'known'){
-    learn.learned.add(learn.queue[0].n);
-    saveLearned();
-    learn.queue.shift();
-  }else if(act === 'again'){
-    learn.queue.push(learn.queue.shift());
+  function renderAvatarInto(el, name, avatarDataUrl) {
+    if (!el) return;
+    if (avatarDataUrl) el.innerHTML = `<img src="${avatarDataUrl}" alt="">`;
+    else el.textContent = (name || "P").slice(0, 1).toUpperCase();
   }
-  learn.flipped = false;
-  renderLearn();
-});
 
-document.getElementById('eraSelect').addEventListener('change', buildLearnPool);
-document.getElementById('femaleOnly').addEventListener('change', buildLearnPool);
-
-/* ── クイズモード ── */
-const quiz = { pool: [], current: null, answered: false, correct: 0, total: 0 };
-
-function startQuiz(){
-  const era = document.getElementById('quizEra').value;
-  quiz.pool = EMPERORS.filter(e => era==='all' || e.era===era);
-  quiz.correct = 0; quiz.total = 0;
-  newQuestion();
-}
-
-function pickDistractors(e, k){
-  const src = quiz.pool.filter(x => x.n !== e.n);
-  const arr = shuffle(src.slice()).slice(0, k);
-  if(arr.length < k){
-    const rest = shuffle(EMPERORS.filter(x => x.n !== e.n && !arr.includes(x)));
-    while(arr.length < k && rest.length) arr.push(rest.pop());
-  }
-  return arr;
-}
-
-function newQuestion(){
-  const e = rand(quiz.pool);
-  const type = Math.random() < 0.5 ? 'name' : 'num';
-  let answer, choices;
-
-  if(type === 'name'){
-    answer = shortName(e);
-    choices = shuffle(pickDistractors(e,3).map(shortName).concat(answer));
-  }else{
-    answer = e.n;
-    choices = shuffle(pickDistractors(e,3).map(x=>x.n).concat(answer));
-  }
-  quiz.current = { e, type, answer, choices };
-  quiz.answered = false;
-  renderQuiz();
-}
-
-function renderQuiz(){
-  const c = quiz.current;
-  document.getElementById('quizScore').innerHTML =
-    `正解 <b>${quiz.correct}</b> <span>/ ${quiz.total}</span>`;
-
-  const qText = c.type === 'name'
-    ? `第 <b>${c.e.n}</b> 代の天皇は？`
-    : `「<b>${shortName(c.e)}</b>」は第何代？`;
-
-  const choicesHtml = c.choices.map((ch,i)=>{
-    const label = c.type === 'name' ? ch : `第 ${ch} 代`;
-    return `<button class="choice" data-i="${i}">${label}</button>`;
-  }).join('');
-
-  document.getElementById('quizBox').innerHTML = `
-    <p class="q-text">${qText}</p>
-    <div class="choices">${choicesHtml}</div>
-    <div class="stamp" id="stamp"></div>`;
-
-  document.getElementById('nextBtn').hidden = true;
-}
-
-document.getElementById('quizBox').addEventListener('click', ev=>{
-  const btn = ev.target.closest('.choice');
-  if(!btn || quiz.answered) return;
-  quiz.answered = true;
-
-  const c = quiz.current;
-  const chosen = c.choices[+btn.dataset.i];
-  const ok = chosen === c.answer;
-
-  quiz.total++;
-  if(ok) quiz.correct++;
-
-  document.querySelectorAll('#quizBox .choice').forEach(b=>{
-    b.disabled = true;
-    const v = c.choices[+b.dataset.i];
-    if(v === c.answer) b.classList.add('correct');
-    else if(b === btn) b.classList.add('wrong');
-  });
-
-  const stamp = document.getElementById('stamp');
-  stamp.textContent = ok ? '正解' : '不正解';
-  stamp.classList.add('show');
-  if(!ok) stamp.classList.add('ng');
-
-  document.getElementById('quizScore').innerHTML =
-    `正解 <b>${quiz.correct}</b> <span>/ ${quiz.total}</span>`;
-
-  document.getElementById('nextBtn').hidden = false;
-});
-
-document.getElementById('nextBtn').addEventListener('click', newQuestion);
-document.getElementById('quizEra').addEventListener('change', startQuiz);
-
-/* ── 一覧モード ── */
-function renderList(filter){
-  const f = (filter||'').trim();
-  let html = '';
-  ERA_ORDER.forEach(era=>{
-    const items = EMPERORS.filter(e => e.era === era && (
-      !f || e.name.includes(f) || e.kana.includes(f) ||
-      String(e.n) === f || fullName(e).includes(f)
-    ));
-    if(!items.length) return;
-    html += `<div class="list-group"><h3>${era}</h3>`;
-    items.forEach(e=>{
-      html += `<div class="row">
-        <span class="no">第${e.n}代</span>
-        <span class="nm">${fullName(e)}</span>
-        ${e.female?'<span class="f-tag">女帝</span>':''}
-        <span class="kn">${e.kana}</span>
-      </div>`;
+  function applyUserProfileToUI() {
+    document.body.setAttribute("data-theme", userProfile.theme || "emerald");
+    document.getElementById("menu-name-preview").textContent = userProfile.name;
+    renderAvatarInto(document.getElementById("menu-avatar-preview"), userProfile.name, userProfile.avatar);
+    renderAvatarInto(document.getElementById("settings-avatar-preview"), userProfile.name, userProfile.avatar);
+    document.getElementById("input-player-name").value = userProfile.name;
+    document.getElementById("opt-cpuSpeed").value = String(userProfile.cpuSpeed);
+    document.querySelectorAll(".theme-swatch").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.theme === userProfile.theme);
     });
-    html += `</div>`;
-  });
-  document.getElementById('listBody').innerHTML =
-    html || '<p class="empty">該当する天皇はありません</p>';
-}
-document.getElementById('searchInput').addEventListener('input', e=>{
-  renderList(e.target.value);
-});
+  }
 
-/* ── 起動 ── */
-buildLearnPool();
-startQuiz();
-renderList('');
+  function resizeAvatarFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const size = 128;
+          const canvas = document.createElement("canvas");
+          canvas.width = size; canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          const minSide = Math.min(img.width, img.height);
+          ctx.drawImage(img, (img.width - minSide) / 2, (img.height - minSide) / 2, minSide, minSide, 0, 0, size, size);
+          resolve(canvas.toDataURL("image/jpeg", 0.78));
+        };
+        img.onerror = reject;
+        img.src = reader.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  let menuNoticeTimer = null;
+  function showMenuNotice(msg) {
+    const el = document.getElementById("menu-notice-toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(menuNoticeTimer);
+    menuNoticeTimer = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+
+  // =========================================================
+  // 1. トランプSVGモデリング＆1秒ホバーツールチップ
+  // =========================================================
+  const SUIT_PATHS = {
+    spade: `<path d="M 0,-18 C -3.5,-10 -15,-3.5 -15,4.5 C -15,10.5 -9,13.5 -4,10.5 C -2.5,9.5 -1.4,7.8 -0.9,5.5 C -1.4,10.5 -3.2,14.5 -5.8,17 L 5.8,17 C 3.2,14.5 1.4,10.5 0.9,5.5 C 1.4,7.8 2.5,9.5 4,10.5 C 9,13.5 15,10.5 15,4.5 C 15,-3.5 3.5,-10 0,-18 Z"/>`,
+    heart: `<path d="M 0,-6.5 C -3.2,-16 -16,-15.5 -16,-4 C -16,5.5 -5,11.5 0,18 C 5,11.5 16,5.5 16,-4 C 16,-15.5 3.2,-16 0,-6.5 Z"/>`,
+    diamond: `<path d="M 0,-18 Q 5,-5.5 14,0 Q 5,5.5 0,18 Q -5,5.5 -14,0 Q -5,-5.5 0,-18 Z"/>`,
+    club: `<circle cx="0" cy="-8.5" r="6.8"/><circle cx="-7.8" cy="3.2" r="6.8"/><circle cx="7.8" cy="3.2" r="6.8"/><path d="M -3,-2 L 3,-2 L 1.4,4.5 C 2,10 3.5,14.5 5.8,17 L -5.8,17 C -3.5,14.5 -2,10 -1.4,4.5 Z"/>`
+  };
+  const SUIT_COLOR = { spade: "#181a1f", club: "#181a1f", heart: "#bd1e24", diamond: "#bd1e24" };
+  const SUIT_LABEL = { spade: "スペード", heart: "ハート", diamond: "ダイヤ", club: "クラブ" };
+  const SUIT_SYMBOL = { spade: "♠", heart: "♥", diamond: "♦", club: "♣" };
+  const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+  const STRENGTH_ORDER = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"];
+
+  const PIP_LAYOUTS = {
+    "2": [[100, 56, false], [100, 224, true]],
+    "3": [[100, 56, false], [100, 140, false], [100, 224, true]],
+    "4": [[65, 56, false], [135, 56, false], [65, 224, true], [135, 224, true]],
+    "5": [[65, 56, false], [135, 56, false], [100, 140, false], [65, 224, true], [135, 224, true]],
+    "6": [[65, 56, false], [135, 56, false], [65, 140, false], [135, 140, false], [65, 224, true], [135, 224, true]],
+    "7": [[65, 56, false], [135, 56, false], [100, 98, false], [65, 140, false], [135, 140, false], [65, 224, true], [135, 224, true]],
+    "8": [[65, 56, false], [135, 56, false], [100, 98, false], [65, 140, false], [135, 140, false], [100, 182, true], [65, 224, true], [135, 224, true]],
+    "9": [[65, 54, false], [135, 54, false], [65, 111, false], [135, 111, false], [100, 140, false], [65, 169, true], [135, 169, true], [65, 226, true], [135, 226, true]],
+    "10": [[65, 54, false], [135, 54, false], [100, 82, false], [65, 111, false], [135, 111, false], [65, 169, true], [135, 169, true], [100, 198, true], [65, 226, true], [135, 226, true]]
+  };
+
+  function getCardDisplayName(card) {
+    if (card.type === "joker") return "ジョーカー";
+    return `${SUIT_LABEL[card.suit]}の${card.rank}`;
+  }
+
+  function isSameCard(a, b) {
+    if (!a || !b || a.type !== b.type) return false;
+    if (a.type === "joker") return a.variant === b.variant;
+    return a.suit === b.suit && a.rank === b.rank;
+  }
+
+  function suitMarkup(suit, x, y, scale, color, flip = false) {
+    const rot = flip ? " rotate(180)" : "";
+    return `<g transform="translate(${x}, ${y})${rot} scale(${scale})" fill="${color}">${SUIT_PATHS[suit]}</g>`;
+  }
+
+  function renderCorner(rank, suit, color) {
+    const isTen = rank === "10";
+    const cornerPart = `
+      <text x="19" y="34" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="${isTen ? 24 : 27}" letter-spacing="${isTen ? "-2.2" : "0"}" fill="${color}">${rank}</text>
+      ${suitMarkup(suit, 19, 51, 0.45, color, false)}
+    `;
+    return `<g>${cornerPart}</g><g transform="translate(200, 280) rotate(180)">${cornerPart}</g>`;
+  }
+
+  function renderAce(suit, color) {
+    if (suit === "spade") {
+      return `
+        <g opacity="0.22" stroke="#181a1f" fill="none" stroke-width="1.2">
+          <circle cx="100" cy="140" r="52" stroke-dasharray="3 3"/><circle cx="100" cy="140" r="44"/>
+          <path d="M 100,72 L 106,86 L 94,86 Z" fill="#c9a23f" stroke="none"/>
+          <path d="M 100,208 L 106,194 L 94,194 Z" fill="#c9a23f" stroke="none"/>
+        </g>
+        <g transform="translate(100, 138) scale(2.45)" fill="#181a1f">${SUIT_PATHS.spade}</g>
+        <g transform="translate(100, 138) scale(1.75)" fill="none" stroke="#d4af37" stroke-width="0.7" opacity="0.85">${SUIT_PATHS.spade}</g>
+        <text x="100" y="218" text-anchor="middle" font-family="Georgia, serif" font-size="9" letter-spacing="2.2" fill="#7c6832" font-weight="700">ROYAL DECK</text>
+      `;
+    }
+    return suitMarkup(suit, 100, 140, 2.0, color, false);
+  }
+
+  function renderCourt(rank, suit, color) {
+    const isRed = suit === "heart" || suit === "diamond";
+    const accent = isRed ? "#1e3a6d" : "#b91c1c";
+    const gold = "#c89f38", skin = "#f4dcc4";
+    const hair = rank === "K" ? "#d9c8a9" : (rank === "Q" ? "#5c3317" : "#2d241e");
+    let headgear = "", weaponOrItem = "";
+    if (rank === "K") {
+      headgear = `<path d="M 80,68 L 83,52 L 92,61 L 100,48 L 108,61 L 117,52 L 120,68 Z" fill="${gold}" stroke="#222" stroke-width="1"/><rect x="80" y="67" width="40" height="5" rx="1" fill="${accent}" stroke="#222" stroke-width="0.9"/><circle cx="100" cy="48" r="2.2" fill="${accent}"/>`;
+      weaponOrItem = `<path d="M 60,136 L 60,64 L 64,54 L 68,64 L 68,136 Z" fill="#d5dce3" stroke="#222" stroke-width="0.9"/><line x1="64" y1="62" x2="64" y2="132" stroke="#8a96a3" stroke-width="1"/><rect x="54" y="114" width="20" height="4" rx="1.5" fill="${gold}" stroke="#222" stroke-width="0.8"/>`;
+    } else if (rank === "Q") {
+      headgear = `<path d="M 83,70 Q 100,56 117,70 L 113,60 L 105,64 L 100,52 L 95,64 L 87,60 Z" fill="${gold}" stroke="#222" stroke-width="0.9"/><circle cx="100" cy="52" r="2.2" fill="${color}"/><circle cx="87" cy="60" r="1.5" fill="${accent}"/><circle cx="113" cy="60" r="1.5" fill="${accent}"/>`;
+      weaponOrItem = `<path d="M 134,136 Q 134,110 130,94" fill="none" stroke="#1f6f43" stroke-width="2.2"/><circle cx="130" cy="88" r="8" fill="${isRed ? '#b91c1c' : '#c89f38'}" stroke="#222" stroke-width="0.9"/><circle cx="130" cy="88" r="4" fill="${isRed ? '#ef4444' : '#f3d27a'}"/><path d="M 132,115 Q 142,108 143,115 Q 136,120 132,115 Z" fill="#2d8a56"/>`;
+    } else {
+      headgear = `<path d="M 79,71 Q 100,54 123,68 L 118,74 L 82,74 Z" fill="${accent}" stroke="#222" stroke-width="1"/><path d="M 112,63 Q 130,48 138,54 Q 128,63 116,68 Z" fill="${gold}" stroke="#222" stroke-width="0.8"/>`;
+      weaponOrItem = `<rect x="60" y="66" width="3.5" height="72" fill="#5b3a22"/><path d="M 60,66 L 62,48 L 65,66 Z" fill="#cfd6dd" stroke="#222" stroke-width="0.8"/><path d="M 60,72 Q 49,76 51,88 Q 56,84 60,84 Z" fill="#cfd6dd" stroke="#222" stroke-width="0.8"/>`;
+    }
+    const halfFigure = `
+      <rect x="40" y="36" width="120" height="104" fill="#f7f2e6"/>
+      <path d="M 40,36 L 100,140 L 160,36 Z" fill="${isRed ? 'rgba(189,30,36,0.06)' : 'rgba(24,26,31,0.06)'}"/>
+      <circle cx="100" cy="95" r="38" fill="none" stroke="${gold}" stroke-width="1" stroke-dasharray="2 3" opacity="0.65"/>
+      <path d="M 66,140 L 74,104 Q 100,96 126,104 L 134,140 Z" fill="${accent}" stroke="#222" stroke-width="1.1"/>
+      <path d="M 80,140 L 86,104 L 114,104 L 120,140 Z" fill="${color}" stroke="#222" stroke-width="1"/>
+      <path d="M 82,104 L 100,132 L 118,104" fill="none" stroke="${gold}" stroke-width="3.2"/>
+      <path d="M 88,104 L 100,122 L 112,104 Z" fill="#fffaf0" stroke="#222" stroke-width="0.8"/>
+      <path d="M 82,74 Q 77,94 83,104 L 117,104 Q 123,94 118,74 Z" fill="${hair}" stroke="#222" stroke-width="0.9"/>
+      <path d="M 86,73 Q 86,101 100,103 Q 114,101 114,73 Z" fill="${skin}" stroke="#222" stroke-width="1"/>
+      <path d="M 90,82 Q 93,80 96,82" fill="none" stroke="#222" stroke-width="1.1"/>
+      <path d="M 104,82 Q 107,80 110,82" fill="none" stroke="#222" stroke-width="1.1"/>
+      <circle cx="93" cy="85" r="1.2" fill="#222"/><circle cx="107" cy="85" r="1.2" fill="#222"/>
+      <path d="M 100,85 L 99,91 L 101,91" fill="none" stroke="#a67c5b" stroke-width="0.9"/>
+      <path d="M 96,95 Q 100,97 104,95" fill="none" stroke="#8b3a3a" stroke-width="1.1"/>
+      ${rank === "K" ? `<path d="M 93,93 Q 100,91 107,93" fill="none" stroke="#887a65" stroke-width="1.3"/><path d="M 89,97 Q 100,107 111,97" fill="none" stroke="${hair}" stroke-width="3"/>` : ""}
+      ${headgear}${weaponOrItem}${suitMarkup(suit, 52, 50, 0.42, color, false)}
+    `;
+    const clipIdTop = `ct-${rank}-${suit}-${Math.random().toString(36).slice(2, 7)}`;
+    const clipIdBot = `cb-${rank}-${suit}-${Math.random().toString(36).slice(2, 7)}`;
+    return `
+      <defs>
+        <clipPath id="${clipIdTop}"><path d="M 40,36 L 160,36 L 160,132 L 40,148 Z"/></clipPath>
+        <clipPath id="${clipIdBot}"><path d="M 40,148 L 160,132 L 160,244 L 40,244 Z"/></clipPath>
+      </defs>
+      <g clip-path="url(#${clipIdTop})">${halfFigure}</g>
+      <g clip-path="url(#${clipIdBot})"><g transform="translate(200, 280) rotate(180)">${halfFigure}</g></g>
+      <line x1="40" y1="148" x2="160" y2="132" stroke="${gold}" stroke-width="2"/>
+      <line x1="40" y1="148" x2="160" y2="132" stroke="#222" stroke-width="0.6"/>
+      <rect x="40" y="36" width="120" height="208" rx="3" fill="none" stroke="${gold}" stroke-width="2.2"/>
+      <rect x="42.5" y="38.5" width="115" height="203" rx="2" fill="none" stroke="#222" stroke-width="0.7" opacity="0.5"/>
+    `;
+  }
+
+  function renderJoker(variant = "color") {
+    const isColor = variant === "color";
+    const main = isColor ? "#b91c1c" : "#181a1f";
+    const sub = isColor ? "#1e40af" : "#525866";
+    const gold = isColor ? "#d4af37" : "#8b929e";
+    return `
+      <rect x="26" y="26" width="148" height="228" rx="8" fill="#fbf8ef" stroke="${gold}" stroke-width="2"/>
+      <rect x="31" y="31" width="138" height="218" rx="5" fill="none" stroke="${main}" stroke-width="0.8" stroke-dasharray="3 2"/>
+      <text x="15" y="34" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">J</text>
+      <text x="15" y="48" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">O</text>
+      <text x="15" y="62" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">K</text>
+      <text x="15" y="76" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">E</text>
+      <text x="15" y="90" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">R</text>
+      <g transform="translate(200, 280) rotate(180)">
+        <text x="15" y="34" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">J</text>
+        <text x="15" y="48" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">O</text>
+        <text x="15" y="62" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">K</text>
+        <text x="15" y="76" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">E</text>
+        <text x="15" y="90" font-family="Georgia, serif" font-weight="700" font-size="13" fill="${main}">R</text>
+      </g>
+      <circle cx="100" cy="142" r="54" fill="${isColor ? 'rgba(212,175,55,0.12)' : 'rgba(0,0,0,0.05)'}"/>
+      <path d="M 86,105 Q 64,66 48,80 Q 68,86 78,108 Z" fill="${main}" stroke="#222" stroke-width="1"/>
+      <path d="M 114,105 Q 136,66 152,80 Q 132,86 122,108 Z" fill="${sub}" stroke="#222" stroke-width="1"/>
+      <path d="M 92,102 Q 100,56 112,62 Q 104,76 108,102 Z" fill="${gold}" stroke="#222" stroke-width="1"/>
+      <circle cx="48" cy="80" r="4.5" fill="${gold}" stroke="#222" stroke-width="0.9"/>
+      <circle cx="152" cy="80" r="4.5" fill="${gold}" stroke="#222" stroke-width="0.9"/>
+      <circle cx="112" cy="62" r="4.5" fill="${main}" stroke="#222" stroke-width="0.9"/>
+      <circle cx="100" cy="120" r="19" fill="#f7e7d4" stroke="#222" stroke-width="1.1"/>
+      <path d="M 90,115 L 94,119 L 90,121" fill="none" stroke="#222" stroke-width="1.4"/>
+      <path d="M 110,115 L 106,119 L 110,121" fill="none" stroke="#222" stroke-width="1.4"/>
+      <circle cx="100" cy="123" r="2.8" fill="${main}"/>
+      <path d="M 91,129 Q 100,136 109,129" fill="none" stroke="${main}" stroke-width="1.6"/>
+      <path d="M 70,144 L 82,135 L 91,148 L 100,136 L 109,148 L 118,135 L 130,144 L 118,168 L 82,168 Z" fill="${main}" stroke="#222" stroke-width="1"/>
+      <path d="M 82,168 L 100,152 L 118,168 L 110,192 L 90,192 Z" fill="${sub}" stroke="#222" stroke-width="1"/>
+      ${suitMarkup("spade", 60, 210, 0.45, main, false)}${suitMarkup("heart", 86, 210, 0.45, sub, false)}
+      ${suitMarkup("diamond", 114, 210, 0.45, main, false)}${suitMarkup("club", 140, 210, 0.45, sub, false)}
+    `;
+  }
+
+  function buildFrontSVG(card) {
+    if (card.type === "joker") return `<svg class="card-svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">${renderJoker(card.variant)}</svg>`;
+    const { suit, rank } = card;
+    const color = SUIT_COLOR[suit];
+    let centerMarkup = "";
+    if (rank === "A") centerMarkup = renderAce(suit, color);
+    else if (rank === "J" || rank === "Q" || rank === "K") centerMarkup = renderCourt(rank, suit, color);
+    else centerMarkup = PIP_LAYOUTS[rank].map(([x, y, flip]) => suitMarkup(suit, x, y, 0.86, color, flip)).join("");
+    return `<svg class="card-svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">${renderCorner(rank, suit, color)}${centerMarkup}</svg>`;
+  }
+
+  function buildBackSVG() {
+    const pid = "bp-" + Math.random().toString(36).slice(2, 7);
+    return `
+      <svg class="card-svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="${pid}" width="16" height="16" patternUnits="userSpaceOnUse">
+            <rect width="16" height="16" fill="#7c131d"/>
+            <path d="M 8,0 L 16,8 L 8,16 L 0,8 Z" fill="none" stroke="#d4af37" stroke-width="0.65" opacity="0.55"/>
+            <circle cx="8" cy="8" r="1.5" fill="#f3d678" opacity="0.55"/>
+          </pattern>
+        </defs>
+        <rect x="0" y="0" width="200" height="280" fill="#fbf9f3"/>
+        <rect x="11" y="11" width="178" height="258" rx="8" fill="url(#${pid})" stroke="#540a11" stroke-width="1.5"/>
+        <rect x="16" y="16" width="168" height="248" rx="5" fill="none" stroke="#e3c469" stroke-width="1.3"/>
+        <rect x="20" y="20" width="160" height="240" rx="3" fill="none" stroke="#e3c469" stroke-width="0.6" stroke-dasharray="2 2"/>
+        <g transform="translate(100, 140)">
+          <polygon points="0,-42 28,0 0,42 -28,0" fill="#5e0c14" stroke="#e3c469" stroke-width="1.5"/>
+          <circle cx="0" cy="0" r="22" fill="#7c131d" stroke="#e3c469" stroke-width="1.4"/>
+          <path d="M 0,-11 L 3,-3 L 11,0 L 3,3 L 0,11 L -3,3 L -11,0 L -3,-3 Z" fill="#e3c469"/>
+        </g>
+      </svg>
+    `;
+  }
+
+  const tooltipEl = document.getElementById("card-tooltip");
+  let hoverTimer = null;
+  function hideCardTooltip() {
+    if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+    tooltipEl.classList.remove("visible");
+  }
+  function scheduleCardTooltip(wrap, card) {
+    hideCardTooltip();
+    if (wrap.classList.contains("flipped")) return;
+    hoverTimer = setTimeout(() => {
+      if (wrap.classList.contains("flipped") || !document.body.contains(wrap)) return;
+      const rect = wrap.getBoundingClientRect();
+      tooltipEl.textContent = getCardDisplayName(card);
+      tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
+      tooltipEl.style.top = `${rect.top - 10}px`;
+      tooltipEl.classList.add("visible");
+    }, 1000);
+  }
+
+  function createCardElement(card, { flipped = false, interactive = true } = {}) {
+    const wrap = document.createElement("div");
+    wrap.className = "card-wrap" + (flipped ? " flipped" : "");
+    wrap.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-front">${buildFrontSVG(card)}<div class="card-paper-grain"></div><div class="card-sheen"></div></div>
+        <div class="card-face card-back">${buildBackSVG()}<div class="card-paper-grain"></div><div class="card-sheen"></div></div>
+      </div>
+    `;
+    if (interactive) {
+      wrap.addEventListener("mousemove", (e) => {
+        const rect = wrap.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        wrap.querySelectorAll(".card-sheen").forEach(el => {
+          el.style.setProperty("--mx", x + "%");
+          el.style.setProperty("--my", y + "%");
+        });
+      });
+      wrap.addEventListener("mouseenter", () => scheduleCardTooltip(wrap, card));
+      wrap.addEventListener("mouseleave", hideCardTooltip);
+      wrap.addEventListener("mousedown", hideCardTooltip);
+    }
+    return wrap;
+  }
+
+  // =========================================================
+  // 2. ルール設定UIビルダー
+  // =========================================================
+  const RULE_DEFS = [
+    { key: "revolution", label: "革命", desc: "4枚以上出しで強さが逆転" },
+    { key: "eightCut", label: "8切り", desc: "8を出したら場が流れる" },
+    { key: "spade3", label: "スペ3返し", desc: "ジョーカー単騎に♠3で勝てる" },
+    { key: "sevenPass", label: "7渡し", desc: "7を出した枚数分だけ次の人に渡す" },
+    { key: "elevenBack", label: "11バック", desc: "11(J)が出ている間だけ強さ逆転" },
+    { key: "suitLock", label: "スート縛り", desc: "同じスートが続くとそのスート固定" },
+    { key: "stairs", label: "階段", desc: "同スート3枚以上の連番出し" }
+  ];
+
+  function createDefaultRules() {
+    return { revolution: true, eightCut: true, spade3: true, sevenPass: true, elevenBack: true, suitLock: false, stairs: false, jokerCount: 2 };
+  }
+  let activeRules = createDefaultRules();
+
+  function renderRulesEditor(container, rulesObj, editable, onChange) {
+    container.innerHTML = "";
+    const grid = document.createElement("div");
+    grid.className = "settings-grid";
+    for (const def of RULE_DEFS) {
+      const row = document.createElement("div");
+      row.className = "setting-row";
+      row.innerHTML = `
+        <div><div class="setting-label">${def.label}</div><div class="setting-desc">${def.desc}</div></div>
+        <label class="toggle-switch"><input type="checkbox" ${rulesObj[def.key] ? "checked" : ""} ${editable ? "" : "disabled"}><span class="toggle-slider"></span></label>
+      `;
+      const input = row.querySelector("input");
+      if (editable) input.addEventListener("change", () => { rulesObj[def.key] = input.checked; if (onChange) onChange(); });
+      grid.appendChild(row);
+    }
+    const jkRow = document.createElement("div");
+    jkRow.className = "setting-row";
+    jkRow.innerHTML = `
+      <div><div class="setting-label">ジョーカー枚数</div><div class="setting-desc">デッキに含める枚数</div></div>
+      <select class="setting-select" ${editable ? "" : "disabled"}>
+        <option value="2" ${rulesObj.jokerCount === 2 ? "selected" : ""}>2枚</option>
+        <option value="1" ${rulesObj.jokerCount === 1 ? "selected" : ""}>1枚</option>
+        <option value="0" ${rulesObj.jokerCount === 0 ? "selected" : ""}>0枚</option>
+      </select>
+    `;
+    const sel = jkRow.querySelector("select");
+    if (editable) sel.addEventListener("change", () => { rulesObj.jokerCount = parseInt(sel.value, 10); if (onChange) onChange(); });
+    grid.appendChild(jkRow);
+    container.appendChild(grid);
+  }
+
+  // =========================================================
+  // 3. 大富豪 コアゲーム判定ロジック
+  // =========================================================
+  function getRankPower(rank, reversed) {
+    const base = STRENGTH_ORDER.indexOf(rank) + 1;
+    return reversed ? (14 - base) : base;
+  }
+
+  function sortHandCards(cards, reversed) {
+    const sOrder = { spade: 0, heart: 1, diamond: 2, club: 3 };
+    return [...cards].sort((a, b) => {
+      if (a.type === "joker" && b.type === "joker") return a.variant === "color" ? 1 : -1;
+      if (a.type === "joker") return 1;
+      if (b.type === "joker") return -1;
+      const diff = getRankPower(a.rank, reversed) - getRankPower(b.rank, reversed);
+      return diff !== 0 ? diff : sOrder[a.suit] - sOrder[b.suit];
+    });
+  }
+
+  function analyzeHand(cards, reversed, rulesObj) {
+    if (!cards || cards.length === 0) return null;
+    const jokers = cards.filter(c => c.type === "joker");
+    const normals = cards.filter(c => c.type !== "joker");
+
+    if (cards.length === 1) {
+      if (jokers.length === 1) return { type: "single", isJoker: true, power: 99, count: 1, suits: [], jokerCount: 1 };
+      return { type: "single", isJoker: false, power: getRankPower(normals[0].rank, reversed), count: 1, suits: [normals[0].suit], jokerCount: 0 };
+    }
+    if (normals.length === 0) return { type: "group", isAllJoker: true, power: 99, count: cards.length, suits: [], jokerCount: jokers.length };
+    const firstRank = normals[0].rank;
+    if (normals.every(c => c.rank === firstRank)) {
+      return { type: "group", isAllJoker: false, power: getRankPower(firstRank, reversed), count: cards.length, suits: normals.map(c => c.suit), jokerCount: jokers.length };
+    }
+    if (rulesObj.stairs && cards.length >= 3) {
+      const suit = normals[0].suit;
+      if (normals.every(c => c.suit === suit)) {
+        const idxs = normals.map(c => STRENGTH_ORDER.indexOf(c.rank)).sort((a, b) => a - b);
+        for (let i = 1; i < idxs.length; i++) if (idxs[i] === idxs[i - 1]) return null;
+        const minIdx = idxs[0], maxIdx = idxs[idxs.length - 1];
+        if ((maxIdx - minIdx + 1) - normals.length <= jokers.length && cards.length <= STRENGTH_ORDER.length) {
+          let bestPower = -1;
+          const minStart = Math.max(0, maxIdx - cards.length + 1);
+          const maxStart = Math.min(STRENGTH_ORDER.length - cards.length, minIdx);
+          for (let s = minStart; s <= maxStart; s++) {
+            const seqPowers = [];
+            for (let k = 0; k < cards.length; k++) seqPowers.push(getRankPower(STRENGTH_ORDER[s + k], reversed));
+            bestPower = Math.max(bestPower, Math.min(...seqPowers));
+          }
+          if (bestPower > -1) return { type: "stairs", power: bestPower, count: cards.length, suits: Array(cards.length).fill(suit), jokerCount: jokers.length };
+        }
+      }
+    }
+    return null;
+  }
+
+  function matchesLockedSuits(hand, lockedSuits) {
+    if (!lockedSuits || lockedSuits.length === 0) return true;
+    const pool = [...hand.suits];
+    let jokersLeft = hand.jokerCount;
+    for (const reqSuit of lockedSuits) {
+      const idx = pool.indexOf(reqSuit);
+      if (idx !== -1) pool.splice(idx, 1);
+      else if (jokersLeft > 0) jokersLeft--;
+      else return false;
+    }
+    return true;
+  }
+
+  function canPlayCardsOnState(selectedCards, st, rulesObj) {
+    const rev = st.isRevolution !== st.isElevenBack;
+    const hand = analyzeHand(selectedCards, rev, rulesObj);
+    if (!hand) return false;
+    if (!st.lastPlay) return true;
+    if (rulesObj.spade3 && st.lastPlay.type === "single" && st.lastPlay.isJoker) {
+      return selectedCards.length === 1 && selectedCards[0].type === "normal" && selectedCards[0].suit === "spade" && selectedCards[0].rank === "3";
+    }
+    if (hand.count !== st.lastPlay.count || hand.type !== st.lastPlay.type || hand.power <= st.lastPlay.power) return false;
+    if (rulesObj.suitLock && st.lockedSuits && !matchesLockedSuits(hand, st.lockedSuits)) return false;
+    return true;
+  }
+
+  function enumerateLegalPlays(handCards, st, rulesObj) {
+    const results = [];
+    const jokers = handCards.filter(c => c.type === "joker");
+    const normals = handCards.filter(c => c.type !== "joker");
+    for (const c of handCards) if (canPlayCardsOnState([c], st, rulesObj)) results.push([c]);
+    const byRank = {};
+    for (const c of normals) (byRank[c.rank] ||= []).push(c);
+    for (const rank of Object.keys(byRank)) {
+      const grp = byRank[rank];
+      for (let take = 1; take <= grp.length; take++) {
+        for (let jk = 0; jk <= jokers.length; jk++) {
+          if (take + jk < 2) continue;
+          const combo = [...grp.slice(0, take), ...jokers.slice(0, jk)];
+          if (canPlayCardsOnState(combo, st, rulesObj)) results.push(combo);
+        }
+      }
+    }
+    if (jokers.length >= 2 && canPlayCardsOnState(jokers.slice(0, 2), st, rulesObj)) results.push(jokers.slice(0, 2));
+    if (rulesObj.stairs) {
+      const bySuit = {};
+      for (const c of normals) (bySuit[c.suit] ||= []).push(c);
+      for (const suit of Object.keys(bySuit)) {
+        const list = bySuit[suit].sort((a, b) => STRENGTH_ORDER.indexOf(a.rank) - STRENGTH_ORDER.indexOf(b.rank));
+        if (list.length + jokers.length < 3) continue;
+        for (let i = 0; i < list.length; i++) {
+          for (let j = i; j < list.length; j++) {
+            const sub = list.slice(i, j + 1);
+            for (let jk = 0; jk <= jokers.length; jk++) {
+              if (sub.length + jk < 3) continue;
+              const combo = [...sub, ...jokers.slice(0, jk)];
+              if (canPlayCardsOnState(combo, st, rulesObj)) results.push(combo);
+            }
+          }
+        }
+      }
+    }
+    return results;
+  }
+
+  function chooseCpuMove(hand, st, rulesObj) {
+    const candidates = enumerateLegalPlays(hand, st, rulesObj);
+    if (candidates.length === 0) return null;
+    const winning = candidates.find(c => c.length === hand.length);
+    if (winning) return winning;
+    const rev = st.isRevolution !== st.isElevenBack;
+    candidates.sort((a, b) => {
+      const ha = analyzeHand(a, rev, rulesObj), hb = analyzeHand(b, rev, rulesObj);
+      if (!st.lastPlay && a.length !== b.length) return b.length - a.length;
+      if (ha.jokerCount !== hb.jokerCount) return ha.jokerCount - hb.jokerCount;
+      return ha.power - hb.power;
+    });
+    return candidates[0];
+  }
+
+  // =========================================================
+  // 4. クライアントビュー（上がり後の視点切替観戦対応）
+  // =========================================================
+  const playerHandEl = document.getElementById("player-hand");
+  const fieldPileEl = document.getElementById("field-pile");
+  const flyingLayer = document.getElementById("flying-layer");
+  const btnPlay = document.getElementById("btnPlay");
+  const btnPass = document.getElementById("btnPass");
+  const btnCheckField = document.getElementById("btnCheckField");
+  const sevenPassBar = document.getElementById("seven-pass-bar");
+  const sevenPassText = document.getElementById("seven-pass-text");
+  const btnConfirmSevenPass = document.getElementById("btnConfirmSevenPass");
+  const spectateBar = document.getElementById("spectate-bar");
+
+  let viewState = {
+    mode: "single",
+    trueMySeat: 0,
+    spectateSeat: 0,
+    myHand: [],
+    allHands: null, // 自分が上がった後にセットされる [hand0, hand1, hand2, hand3]
+    counts: [13, 13, 13, 13],
+    seatsMeta: [
+      { name: "あなた", avatar: "", isCpu: false },
+      { name: "CPU 1", avatar: "", isCpu: true },
+      { name: "CPU 2", avatar: "", isCpu: true },
+      { name: "CPU 3", avatar: "", isCpu: true }
+    ],
+    turn: 0,
+    passed: [false, false, false, false],
+    finishedOrder: [],
+    fieldGroups: [],
+    lastPlay: null,
+    lockedSuits: null,
+    isRevolution: false,
+    isElevenBack: false,
+    rules: createDefaultRules(),
+    pendingSevenPass: null,
+    selectedIndices: new Set(),
+    animating: false
+  };
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const el = document.getElementById("table-toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show"), 1400);
+  }
+
+  async function playCutin(msg, duration = 750, styleClass = "") {
+    const el = document.getElementById("cutin-banner");
+    el.className = "cutin-banner" + (styleClass ? " " + styleClass : "");
+    el.textContent = msg;
+    void el.offsetWidth;
+    el.classList.add("show");
+    await new Promise(r => setTimeout(r, duration));
+    el.classList.remove("show");
+    await new Promise(r => setTimeout(r, 150));
+  }
+
+  function hasFinishedMe() {
+    return viewState.finishedOrder.indexOf(viewState.trueMySeat) !== -1;
+  }
+
+  function getActiveViewSeat() {
+    return hasFinishedMe() ? viewState.spectateSeat : viewState.trueMySeat;
+  }
+
+  function absToRel(absSeat) {
+    return (absSeat - getActiveViewSeat() + 4) % 4;
+  }
+
+  function relToAbs(relSeat) {
+    return (relSeat + getActiveViewSeat()) % 4;
+  }
+
+  function getDisplayedBottomHand() {
+    if (hasFinishedMe() && viewState.allHands) {
+      return viewState.allHands[viewState.spectateSeat] || [];
+    }
+    return viewState.myHand;
+  }
+
+  function switchSpectateSeat(targetAbsSeat) {
+    if (!hasFinishedMe() || !viewState.allHands) return;
+    viewState.spectateSeat = targetAbsSeat;
+    viewState.selectedIndices.clear();
+    renderMyHand();
+    renderOtherHands();
+    updateTableHUD();
+  }
+
+  function renderSpectateBar() {
+    const show = hasFinishedMe() && viewState.allHands && viewState.finishedOrder.length < 4;
+    spectateBar.classList.toggle("active", show);
+    if (!show) {
+      spectateBar.innerHTML = "";
+      return;
+    }
+
+    spectateBar.innerHTML = `<span class="spectate-label">視点切替：</span>`;
+    for (let abs = 0; abs < 4; abs++) {
+      const meta = viewState.seatsMeta[abs] || { name: `P${abs}`, avatar: "" };
+      const isFin = viewState.finishedOrder.indexOf(abs) !== -1;
+      const btn = document.createElement("button");
+      btn.className = "spectate-btn" + (viewState.spectateSeat === abs ? " active" : "");
+      btn.innerHTML = `
+        <div class="avatar-circle" style="width:20px;height:20px;font-size:10px;"></div>
+        <span>${meta.name}${abs === viewState.trueMySeat ? "(自分)" : ""}</span>
+        <span style="font-size:10px;opacity:0.75;">${isFin ? "上がり" : viewState.counts[abs] + "枚"}</span>
+      `;
+      renderAvatarInto(btn.querySelector(".avatar-circle"), meta.name, meta.avatar);
+      btn.addEventListener("click", () => switchSpectateSeat(abs));
+      spectateBar.appendChild(btn);
+    }
+  }
+
+  function updateTableHUD() {
+    document.getElementById("pill-rev").classList.toggle("active", viewState.isRevolution);
+    document.getElementById("pill-11").classList.toggle("active", viewState.isElevenBack);
+    const bindPill = document.getElementById("pill-bind");
+    if (viewState.lockedSuits && viewState.lockedSuits.length > 0) {
+      bindPill.textContent = `${viewState.lockedSuits.map(s => SUIT_SYMBOL[s]).join("")} 縛り中`;
+      bindPill.classList.add("active");
+    } else {
+      bindPill.classList.remove("active");
+    }
+
+    const canClickBadges = hasFinishedMe() && !!viewState.allHands;
+    const rankNames = ["大富豪", "富豪", "貧民", "大貧民"];
+
+    for (let abs = 0; abs < 4; abs++) {
+      const rel = absToRel(abs);
+      const meta = viewState.seatsMeta[abs] || { name: `P${abs}`, avatar: "" };
+      const badge = document.getElementById(`rel-badge-${rel}`);
+      const avatarEl = document.getElementById(`rel-avatar-${rel}`);
+      const nameEl = document.getElementById(`rel-name-${rel}`);
+      const countEl = document.getElementById(`rel-count-${rel}`);
+      const statusEl = document.getElementById(`rel-status-${rel}`);
+      const finIdx = viewState.finishedOrder.indexOf(abs);
+
+      renderAvatarInto(avatarEl, meta.name, meta.avatar);
+      nameEl.textContent = meta.name + (rel === 0 && hasFinishedMe() && abs !== viewState.trueMySeat ? "（視点）" : "");
+      countEl.textContent = `${viewState.counts[abs]}枚`;
+      badge.classList.toggle("is-turn", viewState.turn === abs && finIdx === -1);
+      badge.classList.toggle("clickable", canClickBadges && rel !== 0);
+
+      if (finIdx !== -1) {
+        statusEl.textContent = rankNames[finIdx];
+        statusEl.className = "status-tag show win";
+      } else if (viewState.passed[abs]) {
+        statusEl.textContent = "パス";
+        statusEl.className = "status-tag show";
+      } else {
+        statusEl.className = "status-tag";
+      }
+    }
+
+    renderSpectateBar();
+
+    const sp = viewState.pendingSevenPass;
+    if (sp && sp.fromSeat === viewState.trueMySeat) {
+      sevenPassBar.classList.add("active");
+      const targetName = (viewState.seatsMeta[sp.targetSeat] || {}).name || "次の人";
+      const cur = viewState.selectedIndices.size;
+      sevenPassText.textContent = `${targetName} に渡すカードを ${sp.count}枚 選んでください（${cur}/${sp.count}）`;
+      btnConfirmSevenPass.disabled = (cur !== sp.count);
+      btnPlay.disabled = true;
+      btnPass.disabled = true;
+      return;
+    } else {
+      sevenPassBar.classList.remove("active");
+    }
+
+    const isMyTurn = (!hasFinishedMe() && viewState.turn === viewState.trueMySeat && !viewState.animating && !sp);
+    const selectedCards = [...viewState.selectedIndices].map(i => viewState.myHand[i]).filter(Boolean);
+    btnPlay.disabled = !(isMyTurn && canPlayCardsOnState(selectedCards, viewState, viewState.rules));
+    btnPass.disabled = !isMyTurn;
+  }
+
+  function renderMyHand() {
+    hideCardTooltip();
+    playerHandEl.innerHTML = "";
+    const isSpectating = hasFinishedMe();
+    playerHandEl.classList.toggle("spectating", isSpectating);
+
+    const hand = getDisplayedBottomHand();
+    const mid = (hand.length - 1) / 2;
+
+    hand.forEach((card, idx) => {
+      const el = createCardElement(card, { flipped: false });
+      const offset = idx - mid;
+      const angle = offset * 1.45;
+      const arcY = Math.pow(offset, 2) * 0.56;
+      el.style.transform = `translateY(${arcY}px) rotate(${angle}deg)`;
+      el.style.zIndex = idx + 1;
+      if (!isSpectating && viewState.selectedIndices.has(idx)) el.classList.add("selected");
+
+      el.addEventListener("click", () => {
+        if (isSpectating) return; // 観戦中は選択不可
+        const sp = viewState.pendingSevenPass;
+        if (sp && sp.fromSeat === viewState.trueMySeat) {
+          if (viewState.selectedIndices.has(idx)) {
+            viewState.selectedIndices.delete(idx);
+            el.classList.remove("selected");
+          } else if (viewState.selectedIndices.size < sp.count) {
+            viewState.selectedIndices.add(idx);
+            el.classList.add("selected");
+          }
+          updateTableHUD();
+          return;
+        }
+        if (viewState.animating) return;
+        if (viewState.selectedIndices.has(idx)) {
+          viewState.selectedIndices.delete(idx);
+          el.classList.remove("selected");
+        } else {
+          viewState.selectedIndices.add(idx);
+          el.classList.add("selected");
+        }
+        updateTableHUD();
+      });
+
+      playerHandEl.appendChild(el);
+    });
+  }
+
+  function renderOtherHands() {
+    const viewSeat = getActiveViewSeat();
+    for (let abs = 0; abs < 4; abs++) {
+      if (abs === viewSeat) continue;
+      const rel = absToRel(abs);
+      const container = document.getElementById(`rel-hand-${rel}`);
+      if (!container) continue;
+      container.innerHTML = "";
+      const cnt = viewState.counts[abs] || 0;
+      for (let i = 0; i < cnt; i++) {
+        container.appendChild(createCardElement({ type: "normal", suit: "spade", rank: "3" }, { flipped: true, interactive: false }));
+      }
+    }
+  }
+
+  // テーブル上の他プレイヤーバッジをクリックしても視点切替
+  [1, 2, 3].forEach((rel) => {
+    document.getElementById(`rel-badge-${rel}`).addEventListener("click", () => {
+      if (!hasFinishedMe() || !viewState.allHands) return;
+      switchSpectateSeat(relToAbs(rel));
+    });
+  });
+
+  function getFieldTargetTransform(groupIdx, cardIdx, groupLen, totalGroups) {
+    const baseAngle = ((groupIdx % 3) - 1) * 5;
+    const baseY = (groupIdx - (totalGroups - 1)) * 4;
+    const dx = (cardIdx - (groupLen - 1) / 2) * 34;
+    const dy = baseY + (cardIdx % 2) * 2;
+    const rot = baseAngle + (cardIdx - (groupLen - 1) / 2) * 5;
+    return { dx, dy, rot };
+  }
+
+  function renderFieldPile(hideLatestCount = 0) {
+    hideCardTooltip();
+    fieldPileEl.innerHTML = "";
+    let z = 1;
+    const total = viewState.fieldGroups.length;
+    viewState.fieldGroups.forEach((group, gIdx) => {
+      const isLatest = gIdx === total - 1;
+      group.forEach((card, i) => {
+        const el = createCardElement(card, { flipped: false });
+        const { dx, dy, rot } = getFieldTargetTransform(gIdx, i, group.length, total);
+        el.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) rotate(${rot}deg)`;
+        el.style.zIndex = z++;
+        if (!isLatest) el.style.filter = "brightness(0.82)";
+        if (isLatest && hideLatestCount > 0) el.style.opacity = "0";
+        fieldPileEl.appendChild(el);
+      });
+    });
+  }
+
+  function getSeatSourceRects(absSeat, count, selectedIdxs = null) {
+    const rel = absToRel(absSeat);
+    if (rel === 0 && selectedIdxs) {
+      const wraps = [...playerHandEl.querySelectorAll(".card-wrap")];
+      return selectedIdxs.map(i => (wraps[i] || playerHandEl).getBoundingClientRect());
+    }
+    const container = rel === 0 ? playerHandEl : document.getElementById(`rel-hand-${rel}`);
+    const wraps = [...container.querySelectorAll(".card-wrap")];
+    const rects = [];
+    for (let i = 0; i < count; i++) {
+      const target = wraps[Math.min(i, wraps.length - 1)] || container;
+      rects.push(target.getBoundingClientRect());
+    }
+    return rects;
+  }
+
+  function animatePlayEvent(absSeat, cards, sourceRects) {
+    return new Promise((resolve) => {
+      const rel = absToRel(absSeat);
+      const pileRect = fieldPileEl.getBoundingClientRect();
+      const centerX = pileRect.left + pileRect.width / 2;
+      const centerY = pileRect.top + pileRect.height / 2;
+      const gIdx = viewState.fieldGroups.length - 1;
+      const total = viewState.fieldGroups.length;
+
+      renderFieldPile(cards.length);
+      let completed = 0;
+      cards.forEach((card, i) => {
+        const src = sourceRects[i] || sourceRects[0];
+        const { dx, dy, rot } = getFieldTargetTransform(gIdx, i, cards.length, total);
+        const flyer = createCardElement(card, { flipped: rel !== 0, interactive: false });
+        flyer.style.position = "fixed"; flyer.style.margin = "0";
+        flyer.style.left = `${src.left}px`; flyer.style.top = `${src.top}px`;
+        flyer.style.width = `${src.width}px`; flyer.style.height = `${src.height}px`;
+        flyer.style.zIndex = 1600 + i;
+        flyer.style.transition = "all 0.36s cubic-bezier(0.22, 1, 0.36, 1)";
+        flyingLayer.appendChild(flyer);
+
+        const sampleFieldCard = fieldPileEl.lastElementChild;
+        const targetW = sampleFieldCard ? sampleFieldCard.offsetWidth : 100;
+        const targetH = sampleFieldCard ? sampleFieldCard.offsetHeight : 140;
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (rel !== 0) flyer.classList.remove("flipped");
+            flyer.style.left = `${centerX - targetW / 2 + dx}px`;
+            flyer.style.top = `${centerY - targetH / 2 + dy}px`;
+            flyer.style.width = `${targetW}px`; flyer.style.height = `${targetH}px`;
+            flyer.style.transform = `rotate(${rot}deg)`;
+          });
+        });
+
+        setTimeout(() => {
+          completed++;
+          if (completed === cards.length) {
+            flyingLayer.innerHTML = "";
+            renderFieldPile(0);
+            resolve();
+          }
+        }, 380);
+      });
+    });
+  }
+
+  function animateTransferEvent(fromSeat, toSeat, count, cardsForDisplay) {
+    return new Promise((resolve) => {
+      const fromRel = absToRel(fromSeat);
+      const toRel = absToRel(toSeat);
+      const srcRects = getSeatSourceRects(fromSeat, count);
+      const destContainer = toRel === 0 ? playerHandEl : document.getElementById(`rel-hand-${toRel}`);
+      const destRect = destContainer.getBoundingClientRect();
+      const destCenterX = destRect.left + destRect.width / 2;
+      const destCenterY = destRect.top + destRect.height / 2;
+
+      let completed = 0;
+      for (let i = 0; i < count; i++) {
+        const card = (cardsForDisplay && cardsForDisplay[i]) ? cardsForDisplay[i] : { type: "normal", suit: "spade", rank: "3" };
+        const src = srcRects[i] || srcRects[0];
+        const flyer = createCardElement(card, { flipped: fromRel !== 0, interactive: false });
+        flyer.style.position = "fixed"; flyer.style.margin = "0";
+        flyer.style.left = `${src.left}px`; flyer.style.top = `${src.top}px`;
+        flyer.style.width = `${src.width}px`; flyer.style.height = `${src.height}px`;
+        flyer.style.zIndex = 1650 + i;
+        flyer.style.transition = "all 0.44s cubic-bezier(0.22, 1, 0.36, 1)";
+        flyingLayer.appendChild(flyer);
+
+        const targetW = toRel === 0 ? 100 : 56;
+        const targetH = targetW * 1.4;
+        const offsetX = (i - (count - 1) / 2) * 22;
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (toRel === 0 && cardsForDisplay) flyer.classList.remove("flipped");
+            else if (fromRel === 0) flyer.classList.add("flipped");
+            flyer.style.left = `${destCenterX - targetW / 2 + offsetX}px`;
+            flyer.style.top = `${destCenterY - targetH / 2}px`;
+            flyer.style.width = `${targetW}px`; flyer.style.height = `${targetH}px`;
+          });
+        });
+
+        setTimeout(() => {
+          completed++;
+          if (completed === count) { flyingLayer.innerHTML = ""; resolve(); }
+        }, 460);
+      }
+    });
+  }
+
+  // =========================================================
+  // 5. ホスト権威ゲームエンジン
+  // =========================================================
+  let hostSessionId = 0;
+  let hostState = {
+    isOnline: false,
+    rules: createDefaultRules(),
+    seats: [
+      { name: "あなた", avatar: "", isCpu: false, conn: null },
+      { name: "CPU 1", avatar: "", isCpu: true, conn: null },
+      { name: "CPU 2", avatar: "", isCpu: true, conn: null },
+      { name: "CPU 3", avatar: "", isCpu: true, conn: null }
+    ],
+    hands: [[], [], [], []],
+    passed: [false, false, false, false],
+    finishedOrder: [],
+    prevRanks: null,
+    prevSeatSignature: null,
+    turn: 0,
+    lastPlayer: null,
+    fieldGroups: [],
+    lastPlay: null,
+    lockedSuits: null,
+    isRevolution: false,
+    isElevenBack: false,
+    pendingSevenPass: null,
+    busy: false
+  };
+
+  const wait = (ms) => new Promise(r => setTimeout(r, ms));
+  const isHostAlive = (sid) => sid === hostSessionId && document.getElementById("view-table").classList.contains("active");
+
+  function getSeatSignature() {
+    return hostState.seats.map(s => `${s.isCpu ? "C" : "H"}:${s.name}`).join("|");
+  }
+
+  function syncAllClients() {
+    const seatsMeta = hostState.seats.map(s => ({ name: s.name, avatar: s.avatar, isCpu: s.isCpu }));
+    const counts = hostState.hands.map(h => h.length);
+    const rev = hostState.isRevolution !== hostState.isElevenBack;
+    const sortedAllHands = hostState.hands.map(h => sortHandCards(h, rev));
+    const spPublic = hostState.pendingSevenPass
+      ? { fromSeat: hostState.pendingSevenPass.fromSeat, targetSeat: hostState.pendingSevenPass.targetSeat, count: hostState.pendingSevenPass.count }
+      : null;
+
+    // ホスト（seat 0）
+    viewState.trueMySeat = 0;
+    if (hostState.finishedOrder.indexOf(0) === -1) viewState.spectateSeat = 0;
+    viewState.myHand = sortedAllHands[0];
+    viewState.allHands = hostState.finishedOrder.indexOf(0) !== -1 ? sortedAllHands : null;
+    viewState.counts = counts;
+    viewState.seatsMeta = seatsMeta;
+    viewState.turn = hostState.turn;
+    viewState.passed = [...hostState.passed];
+    viewState.finishedOrder = [...hostState.finishedOrder];
+    viewState.fieldGroups = hostState.fieldGroups;
+    viewState.lastPlay = hostState.lastPlay;
+    viewState.lockedSuits = hostState.lockedSuits;
+    viewState.isRevolution = hostState.isRevolution;
+    viewState.isElevenBack = hostState.isElevenBack;
+    viewState.rules = hostState.rules;
+    viewState.pendingSevenPass = spPublic;
+
+    renderMyHand();
+    renderOtherHands();
+    renderFieldPile();
+    updateTableHUD();
+
+    // ゲストへ送信（上がったゲストには全手札 allHands を渡す）
+    if (hostState.isOnline) {
+      for (let i = 1; i < 4; i++) {
+        const seat = hostState.seats[i];
+        if (!seat.isCpu && seat.conn && seat.conn.open) {
+          const guestFinished = hostState.finishedOrder.indexOf(i) !== -1;
+          seat.conn.send({
+            type: "STATE_SYNC",
+            payload: {
+              mySeat: i,
+              myHand: sortedAllHands[i],
+              allHands: guestFinished ? sortedAllHands : null,
+              counts,
+              seatsMeta,
+              turn: hostState.turn,
+              passed: hostState.passed,
+              finishedOrder: hostState.finishedOrder,
+              fieldGroups: hostState.fieldGroups,
+              lastPlay: hostState.lastPlay,
+              lockedSuits: hostState.lockedSuits,
+              isRevolution: hostState.isRevolution,
+              isElevenBack: hostState.isElevenBack,
+              rules: hostState.rules,
+              pendingSevenPass: spPublic
+            }
+          });
+        }
+      }
+    }
+  }
+
+  function broadcastEvent(type, payload) {
+    if (hostState.isOnline) {
+      for (let i = 1; i < 4; i++) {
+        const seat = hostState.seats[i];
+        if (!seat.isCpu && seat.conn && seat.conn.open) seat.conn.send({ type, payload });
+      }
+    }
+  }
+
+  async function hostBroadcastCutin(textBuilderOrString, duration, styleClass, sid) {
+    const textFor = (seatIdx) => typeof textBuilderOrString === "function" ? textBuilderOrString(seatIdx) : textBuilderOrString;
+    const clsFor = (seatIdx) => typeof styleClass === "function" ? styleClass(seatIdx) : styleClass;
+    if (hostState.isOnline) {
+      for (let i = 1; i < 4; i++) {
+        const seat = hostState.seats[i];
+        if (!seat.isCpu && seat.conn && seat.conn.open) {
+          seat.conn.send({ type: "CUTIN", payload: { text: textFor(i), duration, styleClass: clsFor(i) } });
+        }
+      }
+    }
+    await playCutin(textFor(0), duration, clsFor(0));
+  }
+
+  function hostBroadcastToast(textFor) {
+    const getT = (i) => typeof textFor === "function" ? textFor(i) : textFor;
+    if (hostState.isOnline) {
+      for (let i = 1; i < 4; i++) {
+        const seat = hostState.seats[i];
+        if (!seat.isCpu && seat.conn && seat.conn.open) seat.conn.send({ type: "TOAST", payload: { text: getT(i) } });
+      }
+    }
+    showToast(getT(0));
+  }
+
+  function createHostDeck(rulesObj) {
+    const deck = [];
+    for (const suit of ["spade", "heart", "diamond", "club"]) {
+      for (const rank of RANKS) deck.push({ type: "normal", suit, rank });
+    }
+    if (rulesObj.jokerCount >= 1) deck.push({ type: "joker", variant: "color" });
+    if (rulesObj.jokerCount >= 2) deck.push({ type: "joker", variant: "mono" });
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    return deck;
+  }
+
+  function hostFindNextUnfinished(fromIdx) {
+    for (let step = 1; step <= 4; step++) {
+      const idx = (fromIdx + step) % 4;
+      if (hostState.finishedOrder.indexOf(idx) === -1) return idx;
+    }
+    return -1;
+  }
+
+  function hostFindNextActive(fromIdx) {
+    for (let step = 1; step <= 4; step++) {
+      const idx = (fromIdx + step) % 4;
+      if (hostState.finishedOrder.indexOf(idx) === -1 && !hostState.passed[idx]) return idx;
+    }
+    return -1;
+  }
+
+  async function hostStartGame(withExchange = false) {
+    const sid = ++hostSessionId;
+    const deck = createHostDeck(hostState.rules);
+    hostState.hands = [[], [], [], []];
+    deck.forEach((c, idx) => hostState.hands[idx % 4].push(c));
+
+    // 前回と同じメンバー構成のときだけカード交換を行う
+    const sameMembers = hostState.prevSeatSignature && hostState.prevSeatSignature === getSeatSignature();
+    let startPlayer = -1;
+    let didExchange = false;
+    if (withExchange && sameMembers && hostState.prevRanks && hostState.prevRanks.length === 4) {
+      const [daifugo, fugo, hinmin, daihinmin] = hostState.prevRanks;
+      const exchange = (winner, loser, num) => {
+        hostState.hands[winner] = sortHandCards(hostState.hands[winner], false);
+        hostState.hands[loser] = sortHandCards(hostState.hands[loser], false);
+        const giveToWinner = hostState.hands[loser].splice(-num, num);
+        const giveToLoser = hostState.hands[winner].splice(0, num);
+        hostState.hands[winner].push(...giveToWinner);
+        hostState.hands[loser].push(...giveToLoser);
+      };
+      exchange(daifugo, daihinmin, 2);
+      exchange(fugo, hinmin, 1);
+      startPlayer = daihinmin;
+      didExchange = true;
+    }
+
+    hostState.isRevolution = false;
+    hostState.isElevenBack = false;
+    hostState.hands = hostState.hands.map(h => sortHandCards(h, false));
+    hostState.passed = [false, false, false, false];
+    hostState.finishedOrder = [];
+    hostState.fieldGroups = [];
+    hostState.lastPlay = null;
+    hostState.lastPlayer = null;
+    hostState.lockedSuits = null;
+    hostState.pendingSevenPass = null;
+    hostState.busy = true;
+
+    if (startPlayer === -1) {
+      startPlayer = hostState.hands.findIndex(h => h.some(c => c.type === "normal" && c.suit === "diamond" && c.rank === "3"));
+      if (startPlayer === -1) startPlayer = 0;
+    }
+    hostState.turn = startPlayer;
+    viewState.spectateSeat = 0;
+    viewState.allHands = null;
+    viewState.selectedIndices.clear();
+
+    if (hostState.isOnline) broadcastEvent("START_TABLE", {});
+    syncAllClients();
+    if (didExchange) hostBroadcastToast("階級に応じたカード交換を行いました");
+
+    await hostBeginTurn(startPlayer, sid);
+  }
+
+  async function hostBeginTurn(playerIdx, sid) {
+    if (!isHostAlive(sid)) return;
+    hostState.turn = playerIdx;
+    hostState.busy = true;
+    syncAllClients();
+
+    await hostBroadcastCutin(
+      (viewer) => viewer === playerIdx ? "あなたのターン！" : `${hostState.seats[playerIdx].name} のターン`,
+      680,
+      (viewer) => viewer === playerIdx ? "turn-you" : "turn-cpu",
+      sid
+    );
+    if (!isHostAlive(sid)) return;
+
+    const seat = hostState.seats[playerIdx];
+    if (!seat.isCpu) {
+      hostState.busy = false;
+      updateTableHUD();
+      if (hostState.isOnline && playerIdx !== 0) broadcastEvent("ENABLE_TURN", { seat: playerIdx });
+    } else {
+      await wait(Math.max(200, userProfile.cpuSpeed - 400));
+      if (!isHostAlive(sid)) return;
+      const move = chooseCpuMove(hostState.hands[playerIdx], hostState, hostState.rules);
+      if (move) {
+        const rects = getSeatSourceRects(playerIdx, move.length);
+        await hostExecutePlay(playerIdx, move, rects, sid);
+      } else {
+        await hostExecutePass(playerIdx, sid);
+      }
+    }
+  }
+
+  async function hostSweepField(nextLeader, sid) {
+    if (!isHostAlive(sid)) return;
+    broadcastEvent("SWEEP", {});
+    fieldPileEl.classList.add("sweeping");
+    await wait(300);
+    if (!isHostAlive(sid)) return;
+    fieldPileEl.classList.remove("sweeping");
+
+    hostState.fieldGroups = [];
+    hostState.lastPlay = null;
+    hostState.lockedSuits = null;
+    hostState.isElevenBack = false;
+    hostState.passed = [false, false, false, false];
+
+    let leader = nextLeader;
+    if (hostState.finishedOrder.indexOf(leader) !== -1) leader = hostFindNextUnfinished(leader);
+    hostState.turn = leader;
+    syncAllClients();
+  }
+
+  async function hostHandleSevenPass(fromIdx, passCount, sid) {
+    if (!isHostAlive(sid)) return false;
+    if (!hostState.rules.sevenPass || passCount <= 0 || hostState.hands[fromIdx].length === 0) return false;
+    const targetIdx = hostFindNextUnfinished(fromIdx);
+    if (targetIdx === -1 || targetIdx === fromIdx) return false;
+
+    const actualCount = Math.min(passCount, hostState.hands[fromIdx].length);
+    await hostBroadcastCutin("7 渡し！", 850, "special", sid);
+    if (!isHostAlive(sid)) return false;
+
+    let chosenCards = [];
+    const fromSeat = hostState.seats[fromIdx];
+
+    if (!fromSeat.isCpu) {
+      viewState.selectedIndices.clear();
+      chosenCards = await new Promise((resolve) => {
+        hostState.pendingSevenPass = { fromSeat: fromIdx, targetSeat: targetIdx, count: actualCount, resolve };
+        syncAllClients();
+      });
+      hostState.pendingSevenPass = null;
+      if (!isHostAlive(sid)) return false;
+    } else {
+      const rev = hostState.isRevolution !== hostState.isElevenBack;
+      chosenCards = sortHandCards(hostState.hands[fromIdx], rev).slice(0, actualCount);
+    }
+
+    chosenCards.forEach(c => {
+      const idx = hostState.hands[fromIdx].findIndex(h => isSameCard(h, c));
+      if (idx !== -1) hostState.hands[fromIdx].splice(idx, 1);
+    });
+    viewState.selectedIndices.clear();
+    syncAllClients();
+
+    if (hostState.isOnline) {
+      for (let i = 1; i < 4; i++) {
+        const seat = hostState.seats[i];
+        if (!seat.isCpu && seat.conn && seat.conn.open) {
+          const canSee = (i === targetIdx || i === fromIdx || hostState.finishedOrder.indexOf(i) !== -1);
+          seat.conn.send({
+            type: "ANIM_TRANSFER",
+            payload: { fromSeat: fromIdx, toSeat: targetIdx, count: chosenCards.length, cardsForDisplay: canSee ? chosenCards : null }
+          });
+        }
+      }
+    }
+    const hostCanSee = (fromIdx === 0 || targetIdx === 0 || hostState.finishedOrder.indexOf(0) !== -1);
+    await animateTransferEvent(fromIdx, targetIdx, chosenCards.length, hostCanSee ? chosenCards : null);
+    if (!isHostAlive(sid)) return false;
+
+    hostState.hands[targetIdx].push(...chosenCards);
+    syncAllClients();
+
+    hostBroadcastToast((viewer) => {
+      if (viewer === targetIdx) return `${hostState.seats[fromIdx].name} から ${chosenCards.map(getCardDisplayName).join("・")} を渡されました`;
+      return `${hostState.seats[fromIdx].name} が ${hostState.seats[targetIdx].name} に ${chosenCards.length}枚 渡しました`;
+    });
+
+    if (hostState.hands[fromIdx].length === 0) {
+      hostState.finishedOrder.push(fromIdx);
+      hostBroadcastToast(`${hostState.seats[fromIdx].name} が上がりました！`);
+      syncAllClients();
+      if (hostState.finishedOrder.length >= 3) {
+        for (let i = 0; i < 4; i++) if (hostState.finishedOrder.indexOf(i) === -1) hostState.finishedOrder.push(i);
+        syncAllClients();
+        await wait(600);
+        if (isHostAlive(sid)) hostShowResult();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async function hostExecutePlay(playerIdx, cards, sourceRects, sid = hostSessionId) {
+    if (!isHostAlive(sid)) return;
+    hostState.busy = true;
+    const rev = hostState.isRevolution !== hostState.isElevenBack;
+    const prevPlay = hostState.lastPlay;
+    const handInfo = analyzeHand(cards, rev, hostState.rules);
+
+    if (hostState.rules.suitLock && prevPlay && !prevPlay.isJoker && !prevPlay.isAllJoker && !handInfo.isJoker && !handInfo.isAllJoker) {
+      if (!hostState.lockedSuits && matchesLockedSuits(handInfo, prevPlay.suits)) {
+        hostState.lockedSuits = [...prevPlay.suits];
+        hostBroadcastToast(`${hostState.lockedSuits.map(s => SUIT_SYMBOL[s]).join("")} 縛り！`);
+      }
+    }
+
+    cards.forEach(playedCard => {
+      const idx = hostState.hands[playerIdx].findIndex(c => isSameCard(c, playedCard));
+      if (idx !== -1) hostState.hands[playerIdx].splice(idx, 1);
+    });
+    viewState.selectedIndices.clear();
+    hostState.fieldGroups.push(cards);
+    hostState.lastPlay = handInfo;
+    hostState.lastPlayer = playerIdx;
+
+    syncAllClients();
+    broadcastEvent("ANIM_PLAY", { playerSeat: playerIdx, cards });
+    await animatePlayEvent(playerIdx, cards, sourceRects || getSeatSourceRects(playerIdx, cards.length));
+    if (!isHostAlive(sid)) return;
+
+    const r = hostState.rules;
+    const isSpade3Return = r.spade3 && prevPlay && prevPlay.type === "single" && prevPlay.isJoker &&
+      cards.length === 1 && cards[0].type === "normal" && cards[0].suit === "spade" && cards[0].rank === "3";
+    const isEightCut = r.eightCut && !isSpade3Return && cards.some(c => c.type === "normal" && c.rank === "8");
+    const isRevolutionTrigger = r.revolution && cards.length >= 4;
+    const isElevenTrigger = r.elevenBack && !isEightCut && !isSpade3Return && cards.some(c => c.type === "normal" && c.rank === "J");
+    const hasSeven = r.sevenPass && !isSpade3Return && cards.some(c => c.type === "normal" && c.rank === "7");
+    const sevenPassCount = hasSeven ? cards.length : 0;
+
+    if (isRevolutionTrigger) {
+      hostState.isRevolution = !hostState.isRevolution;
+      syncAllClients();
+      await hostBroadcastCutin(hostState.isRevolution ? "革 命！" : "革命返し！", 920, "special", sid);
+      if (!isHostAlive(sid)) return;
+    }
+
+    if (isElevenTrigger) {
+      hostState.isElevenBack = true;
+      syncAllClients();
+      await hostBroadcastCutin("11 バック！", 780, "special", sid);
+      if (!isHostAlive(sid)) return;
+    }
+
+    if (hostState.hands[playerIdx].length === 0) {
+      hostState.finishedOrder.push(playerIdx);
+      const justFinishedHuman = !hostState.seats[playerIdx].isCpu;
+      hostBroadcastToast((viewer) =>
+        viewer === playerIdx ? "上がりました！他の人の名前や下のボタンで視点を切り替えられます" : `${hostState.seats[playerIdx].name} が上がりました！`
+      );
+      syncAllClients();
+      if (hostState.finishedOrder.length >= 3) {
+        for (let i = 0; i < 4; i++) if (hostState.finishedOrder.indexOf(i) === -1) hostState.finishedOrder.push(i);
+        syncAllClients();
+        await wait(650);
+        if (isHostAlive(sid)) hostShowResult();
+        hostState.busy = false;
+        return;
+      }
+      if (justFinishedHuman) await wait(350);
+    }
+
+    if (sevenPassCount > 0 && hostState.hands[playerIdx].length > 0) {
+      const gameEnded = await hostHandleSevenPass(playerIdx, sevenPassCount, sid);
+      if (gameEnded || !isHostAlive(sid)) return;
+    }
+
+    if (isSpade3Return || isEightCut) {
+      await hostBroadcastCutin(isSpade3Return ? "スペ3返し！" : "8 切り！", 850, "special", sid);
+      if (!isHostAlive(sid)) return;
+      await hostSweepField(playerIdx, sid);
+      if (!isHostAlive(sid)) return;
+      await hostBeginTurn(hostState.turn, sid);
+      return;
+    }
+
+    await hostAdvanceTurn(playerIdx, sid);
+  }
+
+  async function hostExecutePass(playerIdx, sid = hostSessionId) {
+    if (!isHostAlive(sid)) return;
+    hostState.busy = true;
+    hostState.passed[playerIdx] = true;
+    if (playerIdx === 0) viewState.selectedIndices.clear();
+    syncAllClients();
+
+    await hostBroadcastCutin(
+      (viewer) => `${viewer === playerIdx ? "あなた" : hostState.seats[playerIdx].name} パス！`,
+      700,
+      "pass",
+      sid
+    );
+    if (!isHostAlive(sid)) return;
+    await hostAdvanceTurn(playerIdx, sid);
+  }
+
+  async function hostAdvanceTurn(currentIdx, sid) {
+    if (!isHostAlive(sid)) return;
+    const nextIdx = hostFindNextActive(currentIdx);
+    const activeUnpassed = [0, 1, 2, 3].filter(i => hostState.finishedOrder.indexOf(i) === -1 && !hostState.passed[i]);
+    if (activeUnpassed.length === 0 || (activeUnpassed.length === 1 && activeUnpassed[0] === hostState.lastPlayer)) {
+      await hostBroadcastCutin("場が流れました", 650, "", sid);
+      if (!isHostAlive(sid)) return;
+      await hostSweepField(hostState.lastPlayer, sid);
+      if (!isHostAlive(sid)) return;
+      await hostBeginTurn(hostState.turn, sid);
+      return;
+    }
+    await hostBeginTurn(nextIdx, sid);
+  }
+
+  function hostShowResult() {
+    hostState.prevRanks = [...hostState.finishedOrder];
+    hostState.prevSeatSignature = getSeatSignature();
+    const seatsMeta = hostState.seats.map(s => ({ name: s.name, avatar: s.avatar }));
+    broadcastEvent("GAME_OVER", { finishedOrder: hostState.finishedOrder, seatsMeta });
+    openResultModal(hostState.finishedOrder, seatsMeta, 0, true);
+  }
+
+  // =========================================================
+  // 6. PeerJS オンライン通信
+  // =========================================================
+  const ROOM_PREFIX = "daifugo-jp-room-";
+  let peer = null;
+  let guestConn = null;
+  let currentRoomCode = "";
+
+  function destroyNetwork() {
+    hostSessionId++;
+    if (guestConn) { try { guestConn.close(); } catch (e) {} guestConn = null; }
+    hostState.seats.forEach(s => { if (s.conn) { try { s.conn.close(); } catch (e) {} s.conn = null; } });
+    if (peer) { try { peer.destroy(); } catch (e) {} peer = null; }
+    currentRoomCode = "";
+  }
+
+  function renderLobbySeats(seatsMeta) {
+    const el = document.getElementById("lobby-seats");
+    el.innerHTML = "";
+    for (let i = 0; i < 4; i++) {
+      const s = seatsMeta[i];
+      const div = document.createElement("div");
+      div.className = "lobby-seat" + (!s.isCpu ? " filled" : "");
+      div.innerHTML = `
+        <div class="avatar-circle md" id="lob-av-${i}"></div>
+        <div>
+          <div style="font-size:14px;font-weight:700;">${s.name}</div>
+          <div class="lobby-seat-role">${i === 0 ? "ホスト" : (s.isCpu ? "空き枠（CPUが参加）" : "オンライン参加")}</div>
+        </div>
+      `;
+      el.appendChild(div);
+      renderAvatarInto(div.querySelector(`#lob-av-${i}`), s.name, s.avatar);
+    }
+  }
+
+  function openOnlineLobbyModal(isHost, code, hasCarryover) {
+    closeAllModals();
+    document.getElementById("lobby-title").textContent = isHost ? "オンライン待機ロビー（ホスト）" : "オンライン待機ロビー（参加者）";
+    document.getElementById("lobby-room-id").textContent = code;
+    document.getElementById("lobby-error").textContent = "";
+    document.getElementById("btnStartOnlineGame").style.display = isHost ? "flex" : "none";
+    document.getElementById("guest-wait-msg").style.display = isHost ? "none" : "inline";
+    document.getElementById("lobby-rules-heading").textContent = isHost ? "対戦ルール設定（ホストのみ変更可能）" : "現在の対戦ルール（ホスト設定・閲覧のみ）";
+    document.getElementById("online-exchange-banner").classList.toggle("show", !!hasCarryover);
+    openModal("online-lobby-modal");
+  }
+
+  function syncLobbyToGuests() {
+    const seatsMeta = hostState.seats.map(s => ({ name: s.name, avatar: s.avatar, isCpu: s.isCpu }));
+    const hasCarryover = !!(hostState.prevRanks && hostState.prevSeatSignature === getSeatSignature());
+    document.getElementById("online-exchange-banner").classList.toggle("show", hasCarryover);
+    renderLobbySeats(seatsMeta);
+    for (let i = 1; i < 4; i++) {
+      const s = hostState.seats[i];
+      if (!s.isCpu && s.conn && s.conn.open) {
+        s.conn.send({
+          type: "LOBBY_SYNC",
+          payload: { roomCode: currentRoomCode, seatsMeta, rules: hostState.rules, hasCarryover }
+        });
+      }
+    }
+  }
+
+  function createOnlineRoom() {
+    if (typeof Peer === "undefined") {
+      document.getElementById("online-choice-error").textContent = "PeerJSの読み込みに失敗しました。通信環境をご確認ください。";
+      return;
+    }
+    destroyNetwork();
+    document.getElementById("online-choice-error").textContent = "部屋を作成しています…";
+
+    const tryCreate = (retries = 5) => {
+      const code = String(Math.floor(1000 + Math.random() * 9000));
+      const p = new Peer(ROOM_PREFIX + code);
+
+      p.on("open", () => {
+        peer = p;
+        currentRoomCode = code;
+        hostState.isOnline = true;
+        hostState.rules = createDefaultRules();
+        hostState.prevRanks = null;
+        hostState.prevSeatSignature = null;
+        hostState.seats = [
+          { name: userProfile.name, avatar: userProfile.avatar, isCpu: false, conn: null },
+          { name: "CPU 1", avatar: "", isCpu: true, conn: null },
+          { name: "CPU 2", avatar: "", isCpu: true, conn: null },
+          { name: "CPU 3", avatar: "", isCpu: true, conn: null }
+        ];
+
+        openOnlineLobbyModal(true, code, false);
+        renderRulesEditor(document.getElementById("lobby-rules-container"), hostState.rules, true, syncLobbyToGuests);
+        syncLobbyToGuests();
+      });
+
+      p.on("connection", (conn) => {
+        const freeIdx = hostState.seats.findIndex((s, idx) => idx > 0 && s.isCpu);
+        if (freeIdx === -1 || document.getElementById("view-table").classList.contains("active")) {
+          conn.on("open", () => {
+            conn.send({ type: "JOIN_REJECT", payload: { reason: "満員または対戦中です" } });
+            setTimeout(() => conn.close(), 300);
+          });
+          return;
+        }
+
+        conn.on("open", () => {
+          hostState.seats[freeIdx] = { name: `プレイヤー${freeIdx + 1}`, avatar: "", isCpu: false, conn };
+          syncLobbyToGuests();
+        });
+
+        conn.on("data", (msg) => {
+          if (!msg || !msg.type) return;
+          if (msg.type === "JOIN_INFO") {
+            hostState.seats[freeIdx].name = (msg.payload.name || `プレイヤー${freeIdx + 1}`).slice(0, 12);
+            hostState.seats[freeIdx].avatar = msg.payload.avatar || "";
+            syncLobbyToGuests();
+          } else if (msg.type === "ACTION_PLAY") {
+            if (hostState.busy || hostState.turn !== freeIdx || hostState.pendingSevenPass) return;
+            const cards = msg.payload.cards || [];
+            const hasAll = cards.every(c => hostState.hands[freeIdx].some(h => isSameCard(h, c)));
+            if (hasAll && canPlayCardsOnState(cards, hostState, hostState.rules)) {
+              hostExecutePlay(freeIdx, cards, null, hostSessionId);
+            }
+          } else if (msg.type === "ACTION_PASS") {
+            if (hostState.busy || hostState.turn !== freeIdx || hostState.pendingSevenPass) return;
+            hostExecutePass(freeIdx, hostSessionId);
+          } else if (msg.type === "ACTION_SEVEN_PASS") {
+            const sp = hostState.pendingSevenPass;
+            if (!sp || sp.fromSeat !== freeIdx) return;
+            const chosen = msg.payload.cards || [];
+            if (chosen.length === sp.count) sp.resolve(chosen);
+          } else if (msg.type === "ACTION_FORCE_QUIT") {
+            const byName = (msg.payload && msg.payload.name) || hostState.seats[freeIdx].name;
+            executeForceQuitAsHost(byName);
+          }
+        });
+
+        conn.on("close", () => {
+          hostState.seats[freeIdx] = { name: `CPU ${freeIdx}`, avatar: "", isCpu: true, conn: null };
+          if (document.getElementById("online-lobby-modal").classList.contains("open")) {
+            syncLobbyToGuests();
+          } else if (document.getElementById("view-table").classList.contains("active")) {
+            hostBroadcastToast(`プレイヤーが退出したため CPU ${freeIdx} に切り替わりました`);
+            if (hostState.pendingSevenPass && hostState.pendingSevenPass.fromSeat === freeIdx) {
+              const rev = hostState.isRevolution !== hostState.isElevenBack;
+              const autoCards = sortHandCards(hostState.hands[freeIdx], rev).slice(0, hostState.pendingSevenPass.count);
+              hostState.pendingSevenPass.resolve(autoCards);
+            } else if (hostState.turn === freeIdx && !hostState.busy) {
+              const move = chooseCpuMove(freeIdx, hostState, hostState.rules);
+              if (move) hostExecutePlay(freeIdx, move, null, hostSessionId);
+              else hostExecutePass(freeIdx, hostSessionId);
+            }
+            syncAllClients();
+          }
+        });
+      });
+
+      p.on("error", (err) => {
+        if (err.type === "unavailable-id" && retries > 0) {
+          try { p.destroy(); } catch (e) {}
+          tryCreate(retries - 1);
+        } else {
+          document.getElementById("online-choice-error").textContent = "通信エラーが発生しました: " + err.type;
+        }
+      });
+    };
+    tryCreate();
+  }
+
+  function joinOnlineRoom(code) {
+    if (typeof Peer === "undefined") {
+      document.getElementById("join-error").textContent = "PeerJSの読み込みに失敗しました。";
+      return;
+    }
+    if (!/^\d{4}$/.test(code)) {
+      document.getElementById("join-error").textContent = "4桁の数字を入力してください";
+      return;
+    }
+
+    destroyNetwork();
+    document.getElementById("join-error").textContent = "部屋に接続しています…";
+    document.getElementById("btnDoJoinRoom").disabled = true;
+
+    const p = new Peer();
+    p.on("open", () => {
+      peer = p;
+      const conn = p.connect(ROOM_PREFIX + code, { reliable: true });
+      guestConn = conn;
+      currentRoomCode = code;
+
+      const timeout = setTimeout(() => {
+        if (!conn.open) {
+          document.getElementById("join-error").textContent = "部屋が見つかりませんでした（IDをご確認ください）";
+          document.getElementById("btnDoJoinRoom").disabled = false;
+          destroyNetwork();
+        }
+      }, 8000);
+
+      conn.on("open", () => {
+        clearTimeout(timeout);
+        document.getElementById("btnDoJoinRoom").disabled = false;
+        conn.send({ type: "JOIN_INFO", payload: { name: userProfile.name, avatar: userProfile.avatar } });
+        openOnlineLobbyModal(false, code, false);
+      });
+
+      conn.on("data", async (msg) => {
+        if (!msg || !msg.type) return;
+        const pl = msg.payload || {};
+
+        if (msg.type === "JOIN_REJECT") {
+          clearTimeout(timeout);
+          document.getElementById("btnDoJoinRoom").disabled = false;
+          openModal("online-join-modal");
+          document.getElementById("join-error").textContent = pl.reason || "参加できませんでした";
+          destroyNetwork();
+        } else if (msg.type === "LOBBY_SYNC") {
+          renderLobbySeats(pl.seatsMeta);
+          renderRulesEditor(document.getElementById("lobby-rules-container"), pl.rules, false);
+          document.getElementById("online-exchange-banner").classList.toggle("show", !!pl.hasCarryover);
+        } else if (msg.type === "START_TABLE") {
+          closeAllModals();
+          viewState.mode = "online_guest";
+          viewState.allHands = null;
+          viewState.selectedIndices.clear();
+          switchView("table");
+        } else if (msg.type === "RETURN_TO_LOBBY") {
+          switchView("menu");
+          openOnlineLobbyModal(false, currentRoomCode, !!pl.hasCarryover);
+        } else if (msg.type === "FORCE_QUIT") {
+          destroyNetwork();
+          closeAllModals();
+          switchView("menu");
+          showMenuNotice(`${pl.by || "プレイヤー"} が強制終了（ESC + S）しました`);
+        } else if (msg.type === "STATE_SYNC") {
+          viewState.trueMySeat = pl.mySeat;
+          if (pl.finishedOrder.indexOf(pl.mySeat) === -1) viewState.spectateSeat = pl.mySeat;
+          viewState.myHand = pl.myHand;
+          viewState.allHands = pl.allHands || null;
+          viewState.counts = pl.counts;
+          viewState.seatsMeta = pl.seatsMeta;
+          viewState.turn = pl.turn;
+          viewState.passed = pl.passed;
+          viewState.finishedOrder = pl.finishedOrder;
+          viewState.fieldGroups = pl.fieldGroups;
+          viewState.lastPlay = pl.lastPlay;
+          viewState.lockedSuits = pl.lockedSuits;
+          viewState.isRevolution = pl.isRevolution;
+          viewState.isElevenBack = pl.isElevenBack;
+          viewState.rules = pl.rules;
+          viewState.pendingSevenPass = pl.pendingSevenPass;
+
+          renderMyHand();
+          renderOtherHands();
+          renderFieldPile();
+          updateTableHUD();
+        } else if (msg.type === "ENABLE_TURN") {
+          viewState.animating = false;
+          updateTableHUD();
+        } else if (msg.type === "ANIM_PLAY") {
+          viewState.animating = true;
+          updateTableHUD();
+          await animatePlayEvent(pl.playerSeat, pl.cards, getSeatSourceRects(pl.playerSeat, pl.cards.length));
+          viewState.animating = false;
+          updateTableHUD();
+        } else if (msg.type === "ANIM_TRANSFER") {
+          viewState.animating = true;
+          await animateTransferEvent(pl.fromSeat, pl.toSeat, pl.count, pl.cardsForDisplay);
+          viewState.animating = false;
+          updateTableHUD();
+        } else if (msg.type === "SWEEP") {
+          fieldPileEl.classList.add("sweeping");
+          setTimeout(() => fieldPileEl.classList.remove("sweeping"), 300);
+        } else if (msg.type === "CUTIN") {
+          await playCutin(pl.text, pl.duration, pl.styleClass);
+        } else if (msg.type === "TOAST") {
+          showToast(pl.text);
+        } else if (msg.type === "GAME_OVER") {
+          openResultModal(pl.finishedOrder, pl.seatsMeta, viewState.trueMySeat, false);
+        }
+      });
+
+      conn.on("close", () => {
+        if (document.getElementById("view-table").classList.contains("active") ||
+            document.getElementById("online-lobby-modal").classList.contains("open")) {
+          destroyNetwork();
+          closeAllModals();
+          switchView("menu");
+          showMenuNotice("ホストとの接続が切断されました");
+        }
+      });
+    });
+
+    p.on("error", (err) => {
+      clearTimeout(timeout);
+      document.getElementById("btnDoJoinRoom").disabled = false;
+      document.getElementById("join-error").textContent = "接続できませんでした: " + err.type;
+    });
+  }
+
+  // =========================================================
+  // 7. 強制終了コマンド（ESC + S）で全員終了
+  // =========================================================
+  function executeForceQuitAsHost(byName) {
+    broadcastEvent("FORCE_QUIT", { by: byName });
+    setTimeout(() => {
+      destroyNetwork();
+      closeAllModals();
+      switchView("menu");
+      showMenuNotice(`${byName} が強制終了（ESC + S）しました`);
+    }, 100);
+  }
+
+  function triggerForceQuit() {
+    if (!document.getElementById("view-table").classList.contains("active")) return;
+    if (viewState.mode === "online_guest") {
+      if (guestConn && guestConn.open) {
+        guestConn.send({ type: "ACTION_FORCE_QUIT", payload: { name: userProfile.name } });
+      } else {
+        destroyNetwork();
+        closeAllModals();
+        switchView("menu");
+      }
+    } else if (viewState.mode === "online_host") {
+      executeForceQuitAsHost(userProfile.name);
+    } else {
+      hostSessionId++;
+      closeAllModals();
+      switchView("menu");
+      showMenuNotice("ゲームを強制終了（ESC + S）しました");
+    }
+  }
+
+  const pressedKeys = new Set();
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Escape" || e.key === "Escape") pressedKeys.add("ESC");
+    if (e.code === "KeyS" || (e.key && e.key.toLowerCase() === "s")) pressedKeys.add("S");
+    if (pressedKeys.has("ESC") && pressedKeys.has("S")) {
+      if (document.getElementById("view-table").classList.contains("active")) {
+        e.preventDefault();
+        pressedKeys.clear();
+        triggerForceQuit();
+      }
+    }
+  });
+  window.addEventListener("keyup", (e) => {
+    if (e.code === "Escape" || e.key === "Escape") pressedKeys.delete("ESC");
+    if (e.code === "KeyS" || (e.key && e.key.toLowerCase() === "s")) pressedKeys.delete("S");
+  });
+  window.addEventListener("blur", () => pressedKeys.clear());
+
+  // =========================================================
+  // 8. プレイヤー操作・リザルト・待機画面復帰
+  // =========================================================
+  btnPlay.addEventListener("click", () => {
+    if (hasFinishedMe() || viewState.animating || viewState.turn !== viewState.trueMySeat || viewState.pendingSevenPass) return;
+    const indices = [...viewState.selectedIndices].sort((a, b) => a - b);
+    const cards = indices.map(i => viewState.myHand[i]);
+    if (!canPlayCardsOnState(cards, viewState, viewState.rules)) return;
+
+    if (viewState.mode === "online_guest") {
+      viewState.animating = true;
+      viewState.selectedIndices.clear();
+      updateTableHUD();
+      guestConn.send({ type: "ACTION_PLAY", payload: { cards } });
+    } else {
+      if (hostState.busy) return;
+      const rects = getSeatSourceRects(0, cards.length, indices);
+      hostExecutePlay(0, cards, rects, hostSessionId);
+    }
+  });
+
+  btnPass.addEventListener("click", () => {
+    if (hasFinishedMe() || viewState.animating || viewState.turn !== viewState.trueMySeat || viewState.pendingSevenPass) return;
+    if (viewState.mode === "online_guest") {
+      viewState.animating = true;
+      viewState.selectedIndices.clear();
+      updateTableHUD();
+      guestConn.send({ type: "ACTION_PASS", payload: {} });
+    } else {
+      if (hostState.busy) return;
+      hostExecutePass(0, hostSessionId);
+    }
+  });
+
+  btnConfirmSevenPass.addEventListener("click", () => {
+    const sp = viewState.pendingSevenPass;
+    if (!sp || sp.fromSeat !== viewState.trueMySeat) return;
+    if (viewState.selectedIndices.size !== sp.count) return;
+    const indices = [...viewState.selectedIndices].sort((a, b) => a - b);
+    const chosen = indices.map(i => viewState.myHand[i]);
+
+    if (viewState.mode === "online_guest") {
+      viewState.pendingSevenPass = null;
+      viewState.selectedIndices.clear();
+      updateTableHUD();
+      guestConn.send({ type: "ACTION_SEVEN_PASS", payload: { cards: chosen } });
+    } else if (hostState.pendingSevenPass) {
+      hostState.pendingSevenPass.resolve(chosen);
+    }
+  });
+
+  btnCheckField.addEventListener("click", () => {
+    const latestEl = document.getElementById("modal-latest-cards");
+    const histEl = document.getElementById("modal-history-cards");
+    latestEl.innerHTML = "";
+    histEl.innerHTML = "";
+
+    const latest = viewState.fieldGroups[viewState.fieldGroups.length - 1] || [];
+    if (latest.length === 0) latestEl.innerHTML = `<span style="color:#8da397;font-size:13px;">場にカードは出ていません</span>`;
+    else latest.forEach(c => latestEl.appendChild(createCardElement(c, { flipped: false })));
+
+    const all = viewState.fieldGroups.flat();
+    if (all.length === 0) histEl.innerHTML = `<span style="color:#8da397;font-size:13px;">履歴はありません</span>`;
+    else all.forEach(c => histEl.appendChild(createCardElement(c, { flipped: false })));
+
+    openModal("field-modal-backdrop");
+  });
+
+  document.getElementById("btnCloseFieldModal").addEventListener("click", () => {
+    hideCardTooltip();
+    closeModal("field-modal-backdrop");
+  });
+
+  function openResultModal(finishedOrder, seatsMeta, mySeat, canControlNext) {
+    const labels = ["1位：大富豪", "2位：富豪", "3位：貧民", "4位：大貧民"];
+    const listEl = document.getElementById("result-list");
+    listEl.innerHTML = "";
+    finishedOrder.forEach((seatIdx, rankIdx) => {
+      const meta = seatsMeta[seatIdx] || { name: `P${seatIdx}`, avatar: "" };
+      const row = document.createElement("div");
+      row.className = "result-row" + (seatIdx === mySeat ? " you" : "");
+      row.innerHTML = `
+        <span class="result-rank-badge">${labels[rankIdx]}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="avatar-circle" id="res-av-${rankIdx}"></div>
+          <span>${meta.name}</span>
+        </div>
+      `;
+      listEl.appendChild(row);
+      renderAvatarInto(row.querySelector(`#res-av-${rankIdx}`), meta.name, meta.avatar);
+    });
+    document.getElementById("btnNextRound").style.display = canControlNext ? "flex" : "none";
+    document.getElementById("guest-next-wait").style.display = canControlNext ? "none" : "inline";
+    openModal("result-modal-backdrop");
+  }
+
+  // 「次のゲームへ」→ 待機画面（ロビー／SINGLE待機画面）へ戻る
+  document.getElementById("btnNextRound").addEventListener("click", () => {
+    closeModal("result-modal-backdrop");
+    switchView("menu");
+    if (hostState.isOnline) {
+      const hasCarryover = !!(hostState.prevRanks && hostState.prevSeatSignature === getSeatSignature());
+      broadcastEvent("RETURN_TO_LOBBY", { hasCarryover });
+      openOnlineLobbyModal(true, currentRoomCode, hasCarryover);
+      renderRulesEditor(document.getElementById("lobby-rules-container"), hostState.rules, true, syncLobbyToGuests);
+      syncLobbyToGuests();
+    } else {
+      activeRules = { ...hostState.rules };
+      document.getElementById("single-exchange-banner").classList.toggle("show", !!hostState.prevRanks);
+      renderRulesEditor(document.getElementById("single-rules-container"), activeRules, true);
+      openModal("single-rule-modal");
+    }
+  });
+
+  document.getElementById("btnResultMenu").addEventListener("click", () => {
+    destroyNetwork();
+    closeAllModals();
+    switchView("menu");
+  });
+
+  // =========================================================
+  // 9. ナビゲーション・Settings・ギャラリー
+  // =========================================================
+  function openModal(id) { document.getElementById(id).classList.add("open"); }
+  function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+  function closeAllModals() {
+    document.querySelectorAll(".modal-backdrop").forEach(m => m.classList.remove("open"));
+  }
+
+  function switchView(name) {
+    hideCardTooltip();
+    document.getElementById("cutin-banner").classList.remove("show");
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.getElementById(`view-${name}`).classList.add("active");
+  }
+
+  document.getElementById("btnMenuPlay").addEventListener("click", () => openModal("play-mode-modal"));
+  document.getElementById("btnClosePlayMode").addEventListener("click", () => closeModal("play-mode-modal"));
+
+  // SINGLE
+  document.getElementById("btnSelectSingle").addEventListener("click", () => {
+    closeModal("play-mode-modal");
+    hostState.prevRanks = null;
+    hostState.prevSeatSignature = null;
+    activeRules = createDefaultRules();
+    document.getElementById("single-exchange-banner").classList.remove("show");
+    renderRulesEditor(document.getElementById("single-rules-container"), activeRules, true);
+    openModal("single-rule-modal");
+  });
+  document.getElementById("btnBackFromSingleRule").addEventListener("click", () => {
+    closeModal("single-rule-modal");
+    openModal("play-mode-modal");
+  });
+  document.getElementById("btnStartSingleGame").addEventListener("click", () => {
+    const withExchange = !!hostState.prevRanks;
+    closeAllModals();
+    destroyNetwork();
+    hostState.isOnline = false;
+    hostState.rules = { ...activeRules };
+    hostState.seats = [
+      { name: userProfile.name, avatar: userProfile.avatar, isCpu: false, conn: null },
+      { name: "CPU 1", avatar: "", isCpu: true, conn: null },
+      { name: "CPU 2", avatar: "", isCpu: true, conn: null },
+      { name: "CPU 3", avatar: "", isCpu: true, conn: null }
+    ];
+    viewState.mode = "single";
+    switchView("table");
+    hostStartGame(withExchange);
+  });
+
+  // ONLINE
+  document.getElementById("btnSelectOnline").addEventListener("click", () => {
+    closeModal("play-mode-modal");
+    document.getElementById("online-choice-error").textContent = "";
+    openModal("online-choice-modal");
+  });
+  document.getElementById("btnBackFromOnlineChoice").addEventListener("click", () => {
+    closeModal("online-choice-modal");
+    openModal("play-mode-modal");
+  });
+
+  document.getElementById("btnCreateRoom").addEventListener("click", createOnlineRoom);
+
+  document.getElementById("btnOpenJoinRoom").addEventListener("click", () => {
+    closeModal("online-choice-modal");
+    document.getElementById("joinRoomIdInput").value = "";
+    document.getElementById("join-error").textContent = "";
+    openModal("online-join-modal");
+  });
+  document.getElementById("btnBackFromJoin").addEventListener("click", () => {
+    closeModal("online-join-modal");
+    openModal("online-choice-modal");
+  });
+  document.getElementById("btnDoJoinRoom").addEventListener("click", () => {
+    joinOnlineRoom(document.getElementById("joinRoomIdInput").value.trim());
+  });
+  document.getElementById("joinRoomIdInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("btnDoJoinRoom").click();
+  });
+
+  document.getElementById("btnCopyRoomId").addEventListener("click", () => {
+    if (!currentRoomCode) return;
+    navigator.clipboard?.writeText(currentRoomCode);
+    const btn = document.getElementById("btnCopyRoomId");
+    btn.textContent = "コピーしました！";
+    setTimeout(() => btn.textContent = "IDをコピー", 1500);
+  });
+
+  document.getElementById("btnLeaveLobby").addEventListener("click", () => {
+    destroyNetwork();
+    closeAllModals();
+  });
+
+  document.getElementById("btnStartOnlineGame").addEventListener("click", () => {
+    const withExchange = !!(hostState.prevRanks && hostState.prevSeatSignature === getSeatSignature());
+    closeAllModals();
+    viewState.mode = "online_host";
+    switchView("table");
+    hostStartGame(withExchange);
+  });
+
+  // Settings
+  document.getElementById("btnMenuSettings").addEventListener("click", () => {
+    applyUserProfileToUI();
+    openModal("settings-modal-backdrop");
+  });
+  document.querySelectorAll(".theme-swatch").forEach(btn => {
+    btn.addEventListener("click", () => {
+      userProfile.theme = btn.dataset.theme;
+      applyUserProfileToUI();
+    });
+  });
+
+  const avatarFileInput = document.getElementById("avatarFileInput");
+  document.getElementById("btnUploadAvatar").addEventListener("click", () => avatarFileInput.click());
+  avatarFileInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try { userProfile.avatar = await resizeAvatarFile(file); applyUserProfileToUI(); } catch (err) {}
+    avatarFileInput.value = "";
+  });
+  document.getElementById("btnResetAvatar").addEventListener("click", () => {
+    userProfile.avatar = "";
+    applyUserProfileToUI();
+  });
+  document.getElementById("btnCloseSettings").addEventListener("click", () => {
+    userProfile.name = (document.getElementById("input-player-name").value.trim() || "プレイヤー").slice(0, 12);
+    userProfile.cpuSpeed = parseInt(document.getElementById("opt-cpuSpeed").value, 10);
+    saveUserProfile();
+    applyUserProfileToUI();
+    closeModal("settings-modal-backdrop");
+  });
+
+  // ギャラリー＆Quit
+  document.getElementById("btnMenuGallery").addEventListener("click", () => switchView("gallery"));
+  document.getElementById("btnGalleryBack").addEventListener("click", () => switchView("menu"));
+  document.getElementById("btnMenuQuit").addEventListener("click", () => openModal("quit-modal-backdrop"));
+  document.getElementById("btnQuitCancel").addEventListener("click", () => closeModal("quit-modal-backdrop"));
+  document.getElementById("btnQuitConfirm").addEventListener("click", () => {
+    window.close();
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#050606;color:#d4af37;font-family:serif;font-size:20px;letter-spacing:0.15em;">Thank you for playing DAIFUGO. このタブを閉じて終了してください。</div>`;
+  });
+
+  function renderGallery() {
+    const container = document.getElementById("gallery-sections");
+    container.innerHTML = "";
+    for (const suit of ["spade", "heart", "diamond", "club"]) {
+      const sec = document.createElement("div");
+      sec.className = "gallery-section";
+      sec.innerHTML = `<h3 style="font-size:13px;color:#d7d1c3;margin:0 0 14px;">${SUIT_LABEL[suit]}（A〜K）</h3>`;
+      const grid = document.createElement("div");
+      grid.className = "gallery-grid";
+      for (const rank of RANKS) {
+        const item = document.createElement("div");
+        item.className = "gallery-item";
+        const cardEl = createCardElement({ type: "normal", suit, rank });
+        cardEl.addEventListener("click", () => { hideCardTooltip(); cardEl.classList.toggle("flipped"); });
+        item.appendChild(cardEl);
+        const label = document.createElement("div");
+        label.className = "gallery-label";
+        label.textContent = `${SUIT_LABEL[suit]} ${rank}`;
+        item.appendChild(label);
+        grid.appendChild(item);
+      }
+      sec.appendChild(grid);
+      container.appendChild(sec);
+    }
+    const spSec = document.createElement("div");
+    spSec.className = "gallery-section";
+    spSec.innerHTML = `<h3 style="font-size:13px;color:#d7d1c3;margin:0 0 14px;">ジョーカー（2種）＆ カード裏面</h3>`;
+    const spGrid = document.createElement("div");
+    spGrid.className = "gallery-grid";
+    [
+      { card: { type: "joker", variant: "color" }, flipped: false, title: "ジョーカー（カラー）" },
+      { card: { type: "joker", variant: "mono" }, flipped: false, title: "ジョーカー（モノクロ）" },
+      { card: { type: "joker", variant: "color" }, flipped: true, title: "裏面デザイン" }
+    ].forEach((e) => {
+      const item = document.createElement("div");
+      item.className = "gallery-item";
+      const cardEl = createCardElement(e.card, { flipped: e.flipped });
+      cardEl.addEventListener("click", () => { hideCardTooltip(); cardEl.classList.toggle("flipped"); });
+      item.appendChild(cardEl);
+      const label = document.createElement("div");
+      label.className = "gallery-label";
+      label.textContent = e.title;
+      item.appendChild(label);
+      spGrid.appendChild(item);
+    });
+    spSec.appendChild(spGrid);
+    container.appendChild(spSec);
+  }
+
+  applyUserProfileToUI();
+  renderGallery();
+})();
 </script>
 </body>
 </html>
